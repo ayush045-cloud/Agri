@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:paddingBottom="32dp">
+
+        <!-- PAGE HEADER -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/title_disease" style="@style/PageTitle" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text=" CNN" android:textSize="10.5sp" android:textColor="@color/tag_cnn_text"
+                        android:background="@drawable/bg_tag_cnn"
+                        android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/subtitle_disease" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- API BANNER -->
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="🔌 Backend hook: POST /api/disease/analyse · Send image as multipart/form-data"
+            android:textSize="12sp" android:textColor="#c45400"
+            android:background="@drawable/bg_api_banner"
+            android:padding="12dp" android:layout_marginBottom="16dp" />
+
+        <!-- UPLOAD CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📷 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/upload_leaf_image" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <!-- Upload Zone -->
+            <FrameLayout
+                android:id="@+id/upload_zone"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="@drawable/bg_upload_zone"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="14dp">
+
+                <!-- Default state -->
+                <LinearLayout
+                    android:id="@+id/upload_hint_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🍃" android:textSize="40sp" android:gravity="center" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Tap to upload a leaf photo"
+                        android:textSize="14sp" android:textColor="@color/text_700"
+                        android:textStyle="bold" android:gravity="center" android:layout_marginTop="8dp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="JPG, PNG · Max 10 MB"
+                        android:textSize="12sp" android:textColor="@color/text_300"
+                        android:gravity="center" android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Image preview (hidden by default) -->
+                <ImageView
+                    android:id="@+id/iv_leaf_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- Camera / Gallery buttons -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="14dp">
+                <Button android:id="@+id/btn_pick_gallery"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="🖼 Gallery" style="@style/BtnSecondary"
+                    android:layout_marginEnd="8dp" />
+                <Button android:id="@+id/btn_pick_camera"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="📷 Camera" style="@style/BtnSecondary" />
+            </LinearLayout>
+
+            <!-- Loading state -->
+            <LinearLayout
+                android:id="@+id/ll_disease_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone">
+                <ProgressBar
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:indeterminateTint="@color/green_500" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Analysing leaf…" android:textSize="13sp"
+                    android:textColor="@color/text_300" android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- Result card -->
+            <LinearLayout
+                android:id="@+id/ll_disease_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="14dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_disease_title"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="15sp" android:textColor="@color/text_900" android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tv_disease_desc"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textSize="13sp" android:textColor="@color/text_700"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Confidence track -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_progress_track"
+                    android:layout_marginBottom="4dp">
+                    <View
+                        android:id="@+id/view_conf_fill"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_progress_fill_green" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tv_conf_label"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="12sp" android:textColor="@color/text_300" />
+            </LinearLayout>
+
+            <!-- Info note -->
+            <TextView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="ℹ This runs mock detection. Connect POST /api/disease/analyse to use your real CNN model."
+                android:textSize="12sp" android:textColor="@color/text_300"
+                android:layout_marginTop="12dp" />
+        </LinearLayout>
+
+        <!-- HISTORY CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📋 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/detection_history" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_disease_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Detectable conditions info -->
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_badge_blue"
+                android:padding="12dp"
+                android:layout_marginTop="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Detectable conditions:"
+                    android:textSize="12.5sp" android:textColor="@color/blue_600" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/detectable_conditions"
+                    android:textSize="12.5sp" android:textColor="@color/blue_600"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

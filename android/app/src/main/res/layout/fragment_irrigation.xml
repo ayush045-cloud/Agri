@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:paddingBottom="32dp">
+
+        <!-- ── PAGE HEADER ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/title_irrigation" style="@style/PageTitle" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text=" AI Ready" android:textSize="10.5sp" android:textColor="@color/tag_ai_text"
+                        android:background="@drawable/bg_tag_ai"
+                        android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/subtitle_irrigation" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_run_now"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/run_now"
+                style="@style/BtnPrimary" />
+        </LinearLayout>
+
+        <!-- ── API BANNER ── -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔌 Backend hook: GET /api/irrigation/schedule · POST /api/irrigation/run"
+            android:textSize="12sp"
+            android:textColor="#c45400"
+            android:background="@drawable/bg_api_banner"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- ── TODAY'S SCHEDULE CARD ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📅 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/todays_schedule" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+
+        <!-- ── AI RECOMMENDATION CARD ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🤖 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/ai_recommendation" style="@style/CardTitle" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text=" Backend" android:textSize="10.5sp" android:textColor="@color/tag_ai_text"
+                    android:background="@drawable/bg_tag_ai"
+                    android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                    android:layout_marginStart="6dp" />
+            </LinearLayout>
+
+            <!-- AI recommendation text box -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_ai_rec"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Forecast-based suggestion:"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_700"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_ai_recommendation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rain expected tomorrow (60% probability, ~12mm). Consider skipping Field D &amp; E or reducing by 40%. Current soil moisture is adequate for both crops."
+                    android:textSize="13sp"
+                    android:textColor="@color/text_700"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Model inputs: soil sensor readings, IMD weather API, crop water-requirement tables"
+                android:textSize="12sp"
+                android:textColor="@color/text_300"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Weather context input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/weather_context"
+                style="@style/FormInput"
+                android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_weather_context"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="28°C, partly cloudy, 60% rain tomorrow" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Override note input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/override_note"
+                style="@style/FormInput"
+                android:layout_marginBottom="14dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_override_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/override_hint" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Accept / Edit buttons -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <Button android:id="@+id/btn_accept_plan"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:text="@string/accept_plan" style="@style/BtnPrimary" android:layout_marginEnd="8dp" />
+                <Button android:id="@+id/btn_edit_plan"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:text="@string/edit_plan" style="@style/BtnSecondary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ── CUSTOM IRRIGATION CARD ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="⚙️ " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/calculate_irrigation" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔌 Backend hook: POST /api/irrigation/calculate"
+                android:textSize="12sp" android:textColor="#c45400"
+                android:background="@drawable/bg_api_banner"
+                android:padding="10dp" android:layout_marginBottom="14dp" />
+
+            <!-- Crop Type -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Crop Type" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="10dp">
+                <AutoCompleteTextView
+                    android:id="@+id/sp_crop_type"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:text="Wheat" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Soil Type -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Soil Type" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="10dp">
+                <AutoCompleteTextView
+                    android:id="@+id/sp_soil_type"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:text="Loamy" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Field Area -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Field Area (Acres)" style="@style/FormInput"
+                android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_field_area"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" android:text="3.5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Current Moisture / Target Moisture row -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="Current Moisture (%)" style="@style/FormInput"
+                    android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_current_moisture"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="number" android:text="41" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="Target Moisture (%)" style="@style/FormInput"
+                    android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_target_moisture"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="number" android:text="70" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Growth Stage -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Crop Growth Stage" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="14dp">
+                <AutoCompleteTextView
+                    android:id="@+id/sp_growth_stage"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:text="Vegetative" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_calculate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/calculate_btn"
+                style="@style/BtnPrimary" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

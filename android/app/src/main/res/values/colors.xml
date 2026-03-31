@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ── Green palette (matches website --green-*) ── -->
+    <color name="green_900">#0f2412</color>
+    <color name="green_800">#1a3a1f</color>
+    <color name="green_700">#245229</color>
+    <color name="green_600">#2d6a35</color>
+    <color name="green_500">#3d8b47</color>
+    <color name="green_400">#4caf60</color>
+    <color name="green_200">#a5d6a7</color>
+    <color name="green_100">#e8f5eb</color>
+    <color name="green_50">#f3faf4</color>
+
+    <!-- ── Amber palette ── -->
+    <color name="amber_500">#e6a817</color>
+    <color name="amber_100">#fdf6e3</color>
+    <color name="amber_800">#7a5400</color>
+
+    <!-- ── Blue palette ── -->
+    <color name="blue_600">#2563a8</color>
+    <color name="blue_100">#e8f0fa</color>
+    <color name="blue_border">#c5d9f0</color>
+
+    <!-- ── Red palette ── -->
+    <color name="red_600">#c0392b</color>
+    <color name="red_100">#ffebee</color>
+
+    <!-- ── Text colors ── -->
+    <color name="text_900">#0f1a10</color>
+    <color name="text_700">#1a2b1c</color>
+    <color name="text_500">#3d5240</color>
+    <color name="text_300">#7a9e80</color>
+    <color name="text_200">#adc4b0</color>
+
+    <!-- ── Background / surface ── -->
+    <color name="bg">#f4f9f4</color>
+    <color name="surface">#ffffff</color>
+    <color name="border">#d4e8d6</color>
+
+    <!-- ── Material theme seed colors ── -->
+    <color name="colorPrimary">#2d6a35</color>
+    <color name="colorPrimaryDark">#1a3a1f</color>
+    <color name="colorOnPrimary">#ffffff</color>
+    <color name="colorSecondary">#e6a817</color>
+    <color name="colorOnSecondary">#ffffff</color>
+    <color name="colorSurface">#ffffff</color>
+    <color name="colorBackground">#f4f9f4</color>
+    <color name="colorError">#c0392b</color>
+
+    <!-- ── Badge / status colors ── -->
+    <color name="badge_green_bg">#e8f5eb</color>
+    <color name="badge_green_text">#2d6a35</color>
+    <color name="badge_amber_bg">#fdf6e3</color>
+    <color name="badge_amber_text">#7a5400</color>
+    <color name="badge_red_bg">#ffebee</color>
+    <color name="badge_red_text">#c0392b</color>
+    <color name="badge_blue_bg">#e8f0fa</color>
+    <color name="badge_blue_text">#2563a8</color>
+
+    <!-- ── Tag colors ── -->
+    <color name="tag_ai_bg">#ede9fe</color>
+    <color name="tag_ai_text">#6d28d9</color>
+    <color name="tag_cnn_bg">#e0f2fe</color>
+    <color name="tag_cnn_text">#0369a1</color>
+    <color name="tag_ml_bg">#fef3c7</color>
+    <color name="tag_ml_text">#92400e</color>
+</resources>

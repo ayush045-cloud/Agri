@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_dashboard">
+
+    <fragment
+        android:id="@+id/nav_dashboard"
+        android:name="com.agromind.app.fragments.DashboardFragment"
+        android:label="@string/nav_dashboard" />
+
+    <fragment
+        android:id="@+id/nav_irrigation"
+        android:name="com.agromind.app.fragments.IrrigationFragment"
+        android:label="@string/nav_irrigation" />
+
+    <fragment
+        android:id="@+id/nav_disease"
+        android:name="com.agromind.app.fragments.DiseaseFragment"
+        android:label="@string/nav_disease" />
+
+    <fragment
+        android:id="@+id/nav_crops"
+        android:name="com.agromind.app.fragments.CropsFragment"
+        android:label="@string/nav_crops" />
+
+    <fragment
+        android:id="@+id/nav_chat"
+        android:name="com.agromind.app.fragments.ChatFragment"
+        android:label="@string/nav_chat" />
+
+    <fragment
+        android:id="@+id/nav_sensors"
+        android:name="com.agromind.app.fragments.SensorsFragment"
+        android:label="@string/nav_sensors" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.agromind.app.fragments.SettingsFragment"
+        android:label="@string/nav_settings" />
+
+</navigation>
