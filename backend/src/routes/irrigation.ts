@@ -95,9 +95,17 @@ router.post('/run', async (req: Request, res: Response) => {
  */
 router.post('/accept', async (_req: Request, res: Response) => {
   try {
-    // Mark all scheduled/urgent items as "active" to signal plan acceptance
+    // Mark only today's scheduled/urgent items as "active" to signal plan acceptance
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
     await prisma.irrigationLog.updateMany({
-      where: { status: { in: ['scheduled', 'urgent'] } },
+      where: {
+        status: { in: ['scheduled', 'urgent'] },
+        scheduledAt: { gte: todayStart, lte: todayEnd },
+      },
       data: { status: 'active', startedAt: new Date() },
     });
     res.json({ success: true, message: 'Irrigation plan accepted — schedule updated' });

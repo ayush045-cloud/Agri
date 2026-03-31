@@ -49,13 +49,12 @@ router.post('/', async (req: Request, res: Response) => {
       autoIrr, weather, disease, sms, mandi,
     } = req.body;
 
-    // Upsert first user + farm (single-tenant MVP)
-    let user = await prisma.user.findFirst();
-    if (!user) {
-      user = await prisma.user.create({
-        data: { email: 'admin@agromind.local', name: farmName ?? 'Farm Owner' },
-      });
-    }
+    // Upsert first user (single-tenant MVP) — avoids race-condition duplicate-key errors
+    const user = await prisma.user.upsert({
+      where: { email: 'admin@agromind.local' },
+      update: {},
+      create: { email: 'admin@agromind.local', name: farmName ?? 'Farm Owner' },
+    });
 
     // Update or create farm
     const existingFarm = await prisma.farm.findFirst({ where: { userId: user.id } });

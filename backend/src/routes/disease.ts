@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -41,6 +41,20 @@ const uploadLimiter = rateLimit({
   message: { error: 'Too many uploads from this IP. Please wait before trying again.' },
 });
 
+// ── Multer error wrapper ─────────────────────────────────────────────────────
+// Ensures multer validation errors (wrong file type, size exceeded) are
+// returned as JSON 400 responses rather than Express's default HTML 500.
+function handleUpload(req: Request, res: Response, next: NextFunction): void {
+  upload.single('image')(req, res, (err: unknown) => {
+    if (err) {
+      const msg = err instanceof Error ? err.message : 'Upload failed';
+      res.status(400).json({ error: msg });
+      return;
+    }
+    next();
+  });
+}
+
 /**
  * POST /api/disease/analyse
  * Accepts a multipart/form-data request with an `image` file field
@@ -61,7 +75,7 @@ const uploadLimiter = rateLimit({
  *   imageUrl:    string
  * }
  */
-router.post('/analyse', uploadLimiter, upload.single('image'), async (req: Request, res: Response) => {
+router.post('/analyse', uploadLimiter, handleUpload, async (req: Request, res: Response) => {
   if (!req.file) {
     res.status(400).json({ error: 'No image file provided' });
     return;
@@ -126,9 +140,13 @@ router.post('/analyse', uploadLimiter, upload.single('image'), async (req: Reque
     res.json(result);
   } catch (err) {
     // Cleanup uploaded file on error
-    fs.unlink(req.file.path, () => {});
+    if (req.file) fs.unlink(req.file.path, () => {});
     console.error('[disease/analyse]', err);
-    res.status(502).json({ error: 'AI service unavailable. Please try again.' });
+    if (axios.isAxiosError(err)) {
+      res.status(502).json({ error: 'AI service unavailable. Please try again.' });
+    } else {
+      res.status(500).json({ error: 'Failed to process disease analysis.' });
+    }
   }
 });
 
