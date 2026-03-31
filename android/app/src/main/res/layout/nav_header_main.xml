@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/green_800">
+
+    <!-- Brand icon -->
+    <LinearLayout
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_progress_fill_green"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌿"
+            android:textSize="22sp" />
+    </LinearLayout>
+
+    <!-- App name -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Agro Mind"
+        android:textSize="21sp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:fontFamily="serif"
+        android:layout_marginTop="14dp" />
+
+    <!-- Tagline -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_tagline"
+        android:textSize="10sp"
+        android:textColor="@color/green_200"
+        android:textAllCaps="true"
+        android:letterSpacing="0.08"
+        android:alpha="0.7"
+        android:layout_marginTop="2dp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1affffff"
+        android:layout_marginTop="16dp" />
+
+    <!-- Farm info row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="14dp">
+
+        <!-- Farm avatar -->
+        <TextView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:text="🌾"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:background="@drawable/bg_progress_fill_green" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/farm_name_default"
+                android:textSize="12.5sp"
+                android:textColor="#cde8cf"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/farm_location"
+                android:textSize="11sp"
+                android:textColor="@color/text_300"
+                android:layout_marginTop="1dp" />
+        </LinearLayout>
+
+        <!-- Online dot -->
+        <View
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:background="@drawable/bg_progress_fill_green" />
+    </LinearLayout>
+
+</LinearLayout>

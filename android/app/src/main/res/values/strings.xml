@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Agro Mind</string>
+    <string name="app_tagline">Smart Irrigation &amp; Crop Intelligence</string>
+
+    <!-- Nav labels -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_irrigation">Irrigation</string>
+    <string name="nav_disease">Disease</string>
+    <string name="nav_crops">Crops</string>
+    <string name="nav_chat">AI Chat</string>
+    <string name="nav_sensors">Sensors</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_more">More</string>
+
+    <!-- Page titles / subtitles -->
+    <string name="title_dashboard">Farm Overview</string>
+    <string name="subtitle_dashboard">Real-time status across all monitored fields — Season: Rabi 2025</string>
+    <string name="title_irrigation">Smart Irrigation</string>
+    <string name="subtitle_irrigation">AI-optimised watering schedule based on soil, weather &amp; crop data</string>
+    <string name="title_disease">Disease Detection</string>
+    <string name="subtitle_disease">Upload a leaf photo — AI analyses for disease in seconds</string>
+    <string name="title_crops">Crop Advisor</string>
+    <string name="subtitle_crops">Enter your field conditions — get the best crop recommendations</string>
+    <string name="title_chat">Farm AI Chat</string>
+    <string name="subtitle_chat">Conversational assistant for crop advice, disease management &amp; market info</string>
+    <string name="title_sensors">Sensors &amp; Data</string>
+    <string name="subtitle_sensors">Live readings from all field IoT sensors</string>
+    <string name="title_settings">Settings</string>
+    <string name="subtitle_settings">Configure automation, alerts, and data sources</string>
+
+    <!-- Stat labels -->
+    <string name="stat_water_saved">Water Saved Today</string>
+    <string name="stat_soil_moisture">Avg Soil Moisture</string>
+    <string name="stat_active_fields">Active Fields</string>
+    <string name="stat_disease_alerts">Disease Alerts</string>
+
+    <!-- Dashboard -->
+    <string name="soil_moisture_by_field">Soil Moisture by Field</string>
+    <string name="recent_alerts">Recent Alerts</string>
+    <string name="weekly_water_usage">Weekly Water Usage (Litres)</string>
+    <string name="add_field">+ Add Field</string>
+
+    <!-- Irrigation -->
+    <string name="todays_schedule">Today\'s Schedule</string>
+    <string name="ai_recommendation">AI Recommendation</string>
+    <string name="calculate_irrigation">Calculate Custom Irrigation</string>
+    <string name="run_now">▶ Run Now</string>
+    <string name="accept_plan">✓ Accept Plan</string>
+    <string name="edit_plan">Edit Plan</string>
+    <string name="calculate_btn">Calculate Irrigation Plan</string>
+    <string name="weather_context">Weather context</string>
+    <string name="override_note">Override note</string>
+    <string name="override_hint">e.g. Pump servicing today</string>
+
+    <!-- Disease -->
+    <string name="upload_leaf_image">Upload Leaf Image</string>
+    <string name="upload_hint">Tap to upload or pick from gallery\nJPG, PNG · Max 10 MB</string>
+    <string name="detection_history">Detection History</string>
+    <string name="detectable_conditions">Detectable conditions: Wheat Blight, Leaf Rust, Powdery Mildew, Brown Spot, Bacterial Streak, Healthy</string>
+    <string name="pick_image">Pick Image</string>
+    <string name="camera">Camera</string>
+
+    <!-- Crops -->
+    <string name="field_conditions">Field Conditions</string>
+    <string name="get_recommendations">🔍 Get Recommendations</string>
+    <string name="analysing">⏳ Analysing…</string>
+    <string name="recommended_crops">Recommended Crops</string>
+
+    <!-- Chat -->
+    <string name="chat_hint">Ask about crops, irrigation, disease treatment…</string>
+    <string name="send">Send</string>
+    <string name="thinking">Thinking…</string>
+    <string name="chat_intro">Sat Sri Akal! 🙏 I\'m your Farm AI assistant. Ask me anything about crops, irrigation, diseases, fertilisers, market prices, or government schemes.</string>
+    <string name="chat_assistant_name">Farm AI Assistant · Expert in Indian Agriculture</string>
+
+    <!-- Sensors -->
+    <string name="soil_temperature">Soil Temperature</string>
+    <string name="soil_moisture">Soil Moisture</string>
+    <string name="light_index">Light Index</string>
+    <string name="sensor_status">Sensor Status</string>
+    <string name="export_csv">📥 Export CSV</string>
+    <string name="avg_all_sensors">Average across all sensors</string>
+    <string name="field_weighted_avg">Field-weighted average</string>
+    <string name="solar_radiation">Solar radiation at canopy</string>
+
+    <!-- Settings -->
+    <string name="automation">Automation</string>
+    <string name="farm_configuration">Farm Configuration</string>
+    <string name="save_all">💾 Save All</string>
+    <string name="toggle_auto_irrigation">Auto Irrigation</string>
+    <string name="toggle_auto_irrigation_sub">AI schedules watering automatically</string>
+    <string name="toggle_weather">Weather Integration</string>
+    <string name="toggle_weather_sub">Fetch IMD / Open-Meteo forecast data</string>
+    <string name="toggle_disease">Disease Scan Alerts</string>
+    <string name="toggle_disease_sub">Notify when disease confidence &gt; 80%</string>
+    <string name="toggle_sms">SMS Alerts</string>
+    <string name="toggle_sms_sub">Push alerts to farmer\'s mobile number</string>
+    <string name="toggle_mandi">Market Price Feed</string>
+    <string name="toggle_mandi_sub">Live mandi prices for crops</string>
+    <string name="farm_name">Farm Name</string>
+    <string name="total_area">Total Area (Acres)</string>
+    <string name="primary_water_source">Primary Water Source</string>
+    <string name="alert_language">Alert Language</string>
+    <string name="api_base_url">API Base URL</string>
+    <string name="api_key">API Key</string>
+    <string name="api_url_hint">https://your-backend.com/api</string>
+    <string name="api_key_hint">sk-…</string>
+    <string name="settings_saved">💾 Settings saved successfully</string>
+
+    <!-- Common -->
+    <string name="loading">Loading…</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="api_banner_prefix">🔌 Backend hook:</string>
+    <string name="farm_name_default">Singh\'s Farm, Ludhiana</string>
+    <string name="farm_location">Ludhiana, Punjab</string>
+    <string name="weather_chip">☁ 28°C · Partly cloudy</string>
+    <string name="alert_chip">⚠ 2 Alerts</string>
+    <string name="last_updated">updated now</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+</resources>

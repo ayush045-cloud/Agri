@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp">
+
+    <!-- AI message (default — hidden for user messages) -->
+    <LinearLayout
+        android:id="@+id/ll_bot_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:visibility="gone">
+
+        <!-- Bot avatar -->
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="🌿"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_badge_green"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="2dp" />
+
+        <!-- Bot bubble -->
+        <TextView
+            android:id="@+id/tv_bot_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_chat_bot"
+            android:padding="12dp"
+            android:textSize="13.5sp"
+            android:textColor="@color/text_700" />
+    </LinearLayout>
+
+    <!-- User message -->
+    <LinearLayout
+        android:id="@+id/ll_user_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:layoutDirection="rtl"
+        android:visibility="gone">
+
+        <!-- User avatar -->
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="👨‍🌾"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:background="@drawable/bg_badge_green"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp" />
+
+        <!-- User bubble -->
+        <TextView
+            android:id="@+id/tv_user_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_chat_user"
+            android:padding="12dp"
+            android:textSize="13.5sp"
+            android:textColor="@color/surface"
+            android:layoutDirection="ltr" />
+    </LinearLayout>
+
+</LinearLayout>

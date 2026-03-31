@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@android:drawable/ic_menu_compass"
+        android:title="@string/nav_dashboard" />
+    <item
+        android:id="@+id/nav_irrigation"
+        android:icon="@android:drawable/ic_menu_directions"
+        android:title="@string/nav_irrigation" />
+    <item
+        android:id="@+id/nav_disease"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="@string/nav_disease" />
+    <item
+        android:id="@+id/nav_chat"
+        android:icon="@android:drawable/ic_menu_send"
+        android:title="@string/nav_chat" />
+    <item
+        android:id="@+id/nav_more"
+        android:icon="@android:drawable/ic_menu_more"
+        android:title="@string/nav_more" />
+</menu>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:paddingBottom="32dp">
+
+        <!-- PAGE HEADER -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/title_crops" style="@style/PageTitle" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text=" ML" android:textSize="10.5sp" android:textColor="@color/tag_ml_text"
+                        android:background="@drawable/bg_tag_ml"
+                        android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/subtitle_crops" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- API BANNER -->
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="🔌 Backend hook: POST /api/crops/recommend · Send field params · Receive ranked crop list"
+            android:textSize="12sp" android:textColor="#c45400"
+            android:background="@drawable/bg_api_banner"
+            android:padding="12dp" android:layout_marginBottom="16dp" />
+
+        <!-- FIELD CONDITIONS CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🌍 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/field_conditions" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <!-- Soil Type -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Soil Type" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="10dp">
+                <AutoCompleteTextView android:id="@+id/sp_c_soil"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none" android:text="Loamy" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- pH / Rainfall row -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="pH Level" style="@style/FormInput" android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_c_ph"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" android:text="6.8" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="Annual Rainfall (mm)" style="@style/FormInput" android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_c_rain"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="number" android:text="650" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Temp / Region row -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="Temperature (°C)" style="@style/FormInput" android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_c_temp"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="number" android:text="28" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="State / Region" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_marginStart="6dp">
+                    <AutoCompleteTextView android:id="@+id/sp_c_region"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="none" android:text="Punjab" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Season / Nitrogen row -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="Season" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_marginEnd="6dp">
+                    <AutoCompleteTextView android:id="@+id/sp_c_season"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="none" android:text="Rabi (Oct–Mar)" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:hint="Nitrogen (kg/ha)" style="@style/FormInput" android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_c_nitrogen"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="number" android:text="80" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Water Availability -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Water Availability" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="14dp">
+                <AutoCompleteTextView android:id="@+id/sp_c_water"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none" android:text="Canal (abundant)" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_get_recommendations"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/get_recommendations"
+                style="@style/BtnPrimary" />
+        </LinearLayout>
+
+        <!-- RESULTS CARD (hidden until recommendations ready) -->
+        <LinearLayout
+            android:id="@+id/ll_crop_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:visibility="gone">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="✅ " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/recommended_crops" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_crop_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Advisory note -->
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_badge_amber"
+                android:padding="12dp"
+                android:layout_marginTop="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💡 Advisory note:"
+                    android:textSize="12.5sp" android:textColor="@color/amber_800" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Wheat and Mustard show highest historical yield in Loamy soils with moderate rainfall in Punjab's Rabi season. Consider intercropping for maximum land utilisation."
+                    android:textSize="12.5sp" android:textColor="@color/amber_800"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

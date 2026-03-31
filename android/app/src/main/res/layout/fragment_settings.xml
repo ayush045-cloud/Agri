@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:paddingBottom="32dp">
+
+        <!-- PAGE HEADER -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="20dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/title_settings" style="@style/PageTitle" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/subtitle_settings" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
+            </LinearLayout>
+            <Button android:id="@+id/btn_save_all"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/save_all" style="@style/BtnPrimary" />
+        </LinearLayout>
+
+        <!-- AUTOMATION CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🤖 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/automation" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <!-- Auto Irrigation -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingTop="10dp" android:paddingBottom="10dp">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_auto_irrigation" android:textSize="14sp"
+                        android:textColor="@color/text_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_auto_irrigation_sub" android:textSize="12sp"
+                        android:textColor="@color/text_300" android:layout_marginTop="2dp" />
+                </LinearLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/sw_auto_irrigation"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:checked="true" style="@style/GreenSwitch" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+            <!-- Weather Integration -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingTop="10dp" android:paddingBottom="10dp">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_weather" android:textSize="14sp"
+                        android:textColor="@color/text_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_weather_sub" android:textSize="12sp"
+                        android:textColor="@color/text_300" android:layout_marginTop="2dp" />
+                </LinearLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/sw_weather"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:checked="true" style="@style/GreenSwitch" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+            <!-- Disease Scan Alerts -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingTop="10dp" android:paddingBottom="10dp">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_disease" android:textSize="14sp"
+                        android:textColor="@color/text_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_disease_sub" android:textSize="12sp"
+                        android:textColor="@color/text_300" android:layout_marginTop="2dp" />
+                </LinearLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/sw_disease_alerts"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:checked="true" style="@style/GreenSwitch" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+            <!-- SMS Alerts -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingTop="10dp" android:paddingBottom="10dp">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_sms" android:textSize="14sp"
+                        android:textColor="@color/text_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_sms_sub" android:textSize="12sp"
+                        android:textColor="@color/text_300" android:layout_marginTop="2dp" />
+                </LinearLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/sw_sms"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    style="@style/GreenSwitch" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+            <!-- Market Price Feed -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingTop="10dp" android:paddingBottom="4dp">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_mandi" android:textSize="14sp"
+                        android:textColor="@color/text_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/toggle_mandi_sub" android:textSize="12sp"
+                        android:textColor="@color/text_300" android:layout_marginTop="2dp" />
+                </LinearLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/sw_mandi"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:checked="true" style="@style/GreenSwitch" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- FARM CONFIGURATION CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp">
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🏡 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/farm_configuration" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <!-- Farm Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/farm_name" style="@style/FormInput" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_farm_name"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/farm_name_default" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Total Area -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/total_area" style="@style/FormInput" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_total_area"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" android:text="18.5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Primary Water Source -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/primary_water_source"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="10dp">
+                <AutoCompleteTextView android:id="@+id/sp_water_source"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none" android:text="Canal Irrigation" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Alert Language -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/alert_language"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="10dp">
+                <AutoCompleteTextView android:id="@+id/sp_alert_language"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none" android:text="English" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- API Base URL -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/api_base_url" style="@style/FormInput" android:layout_marginBottom="10dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_api_url"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="@string/api_url_hint"
+                    android:inputType="textUri" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- API Key -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/api_key" style="@style/FormInput"
+                app:endIconMode="password_toggle">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_api_key"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="@string/api_key_hint"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

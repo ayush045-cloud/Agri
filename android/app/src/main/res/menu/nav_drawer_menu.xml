@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@android:drawable/ic_menu_compass"
+            android:title="@string/nav_dashboard" />
+        <item
+            android:id="@+id/nav_irrigation"
+            android:icon="@android:drawable/ic_menu_directions"
+            android:title="@string/nav_irrigation" />
+        <item
+            android:id="@+id/nav_disease"
+            android:icon="@android:drawable/ic_menu_camera"
+            android:title="@string/nav_disease" />
+        <item
+            android:id="@+id/nav_crops"
+            android:icon="@android:drawable/ic_menu_agenda"
+            android:title="@string/nav_crops" />
+        <item
+            android:id="@+id/nav_chat"
+            android:icon="@android:drawable/ic_menu_send"
+            android:title="@string/nav_chat" />
+        <item
+            android:id="@+id/nav_sensors"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/nav_sensors" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="@string/nav_settings" />
+    </group>
+</menu>
