@@ -72,7 +72,8 @@ router.get('/history/:deviceId', async (req: Request, res: Response) => {
       return;
     }
 
-    const limit = Math.min(parseInt(req.query.limit as string ?? '100', 10), 1000);
+    const rawLimit = parseInt(req.query.limit as string ?? '100', 10);
+    const limit = Math.min(isNaN(rawLimit) || rawLimit < 1 ? 100 : rawLimit, 1000);
     const readings = await prisma.sensorReading.findMany({
       where: { sensorId: sensor.id },
       orderBy: { recordedAt: 'desc' },
