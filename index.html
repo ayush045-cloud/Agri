@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agro Mind — Smart Irrigation & Crop Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
   /* ════════════════════════════════════
      DESIGN TOKENS
@@ -528,6 +529,94 @@
   }
   .quick-chip:hover { background: var(--green-100); border-color: var(--green-200); color: var(--green-700); }
 
+  /* ── GRADIENT STAT CARDS ── */
+  .stat-card.gradient { border-color: transparent; }
+  .stat-card.gradient::after { display: none; }
+  .stat-card.gradient .stat-label { color: rgba(255,255,255,0.78); }
+  .stat-card.gradient .stat-value { color: #fff; }
+  .stat-card.gradient .stat-delta { color: rgba(255,255,255,0.65); }
+  .stat-card.gradient .stat-delta.pos { color: rgba(255,255,255,0.9); }
+  .stat-card.gradient .stat-icon { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+  .stat-card.g-green  { background: linear-gradient(135deg, #2d6a35, #1a3a1f); }
+  .stat-card.g-blue   { background: linear-gradient(135deg, #2563a8, #1a3a8a); }
+  .stat-card.g-teal   { background: linear-gradient(135deg, #245229, #0f2412); }
+  .stat-card.g-lgreen { background: linear-gradient(135deg, #3d8b47, #2d6a35); }
+
+  /* ── MANDI PRICES ── */
+  .mandi-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .mandi-row:last-child { border-bottom: none; }
+  .mandi-crop { font-size: 13px; font-weight: 600; color: var(--text-700); }
+  .mandi-price { font-size: 13px; font-weight: 700; color: var(--green-700); }
+  .mandi-trend { font-size: 11px; margin-top: 2px; }
+  .mandi-trend.up   { color: var(--green-500); }
+  .mandi-trend.down { color: var(--red-600); }
+  .mandi-trend.flat { color: var(--text-300); }
+  .mandi-source { font-size: 10px; color: var(--text-200); padding-top: 10px; border-top: 1px solid var(--border); margin-top: 4px; }
+
+  /* ── SENSOR CLICKABLE CARDS ── */
+  .sensor-card {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 8px;
+    user-select: none;
+  }
+  .sensor-card:last-child { margin-bottom: 0; }
+  .sensor-card:hover { border-color: var(--green-400); background: var(--green-50); }
+  .sensor-card.selected { border-color: var(--green-500); background: var(--green-50); box-shadow: 0 0 0 3px rgba(76,175,96,0.1); }
+  .sensor-card-left { flex: 1; }
+  .sensor-card-id { font-size: 13.5px; font-weight: 700; color: var(--text-900); }
+  .sensor-card-field { font-size: 12px; font-weight: 600; color: var(--green-700); margin-top: 2px; }
+  .sensor-card-info { font-size: 11.5px; color: var(--text-300); margin-top: 3px; line-height: 1.5; }
+
+  /* ── SENSOR HISTORY CHART ── */
+  .sensor-history-wrap {
+    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: none;
+  }
+  .sensor-history-wrap.show { display: block; animation: slideUp 0.2s ease; }
+  .sensor-history-title { font-size: 13.5px; font-weight: 700; color: var(--text-900); margin-bottom: 14px; }
+  .history-chart-svg { width: 100%; overflow: visible; }
+  .history-legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-500); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── CHAT SUGGESTIONS ── */
+  .chat-suggestions {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 20px;
+    flex: 1;
+  }
+  .chat-suggest-icon { font-size: 42px; margin-bottom: 10px; }
+  .chat-suggest-title { font-size: 14.5px; font-weight: 700; color: var(--text-900); margin-bottom: 4px; }
+  .chat-suggest-sub { font-size: 12px; color: var(--text-300); margin-bottom: 18px; }
+  .chat-suggest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; max-width: 520px; }
+  .chat-suggest-btn {
+    text-align: left;
+    padding: 11px 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    color: var(--text-700);
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1.5;
+  }
+  .chat-suggest-btn:hover { background: var(--green-50); border-color: var(--green-300, var(--green-200)); color: var(--green-700); }
+
+  /* ── FARM MAP ── */
+  #farm-map { height: 280px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px; z-index: 1; }
+
   /* ── SKELETON ── */
   .skeleton { background: linear-gradient(90deg, var(--border) 25%, #e8f0e8 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 6px; }
   @keyframes shimmer { to { background-position: -200% 0; } }
@@ -808,29 +897,29 @@
 
     <!-- Stats -->
     <div class="grid-4">
-      <div class="stat-card c-green">
+      <div class="stat-card gradient g-green">
         <div class="stat-icon">💧</div>
         <div class="stat-label">Water Saved Today</div>
         <div class="stat-value" id="stat-water">1,840 L</div>
         <div class="stat-delta pos">↑ 12% vs yesterday</div>
       </div>
-      <div class="stat-card c-amber">
+      <div class="stat-card gradient g-teal">
         <div class="stat-icon">🌱</div>
         <div class="stat-label">Avg Soil Moisture</div>
         <div class="stat-value" id="stat-moisture">68%</div>
         <div class="stat-delta pos">↑ Optimal range</div>
       </div>
-      <div class="stat-card c-blue">
+      <div class="stat-card gradient g-blue">
         <div class="stat-icon">🌾</div>
         <div class="stat-label">Active Fields</div>
         <div class="stat-value" id="stat-fields">6</div>
         <div class="stat-delta">4 irrigated today</div>
       </div>
-      <div class="stat-card c-red">
+      <div class="stat-card gradient g-lgreen">
         <div class="stat-icon">⚠️</div>
         <div class="stat-label">Disease Alerts</div>
         <div class="stat-value" id="stat-disease">2</div>
-        <div class="stat-delta neg">Wheat blight risk</div>
+        <div class="stat-delta">Wheat blight risk</div>
       </div>
     </div>
 
@@ -851,6 +940,21 @@
     <div class="card">
       <div class="card-title"><span class="title-icon">📈</span> Weekly Water Usage (Litres)</div>
       <div class="bar-chart" id="bar-chart"></div>
+    </div>
+
+    <!-- Schedule + Mandi Prices -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="title-icon">📅</span> Today's Irrigation Schedule</div>
+        <div id="dash-schedule-list"></div>
+      </div>
+      <!-- Mandi Market Prices -->
+      <div class="card">
+        <div class="card-title"><span class="title-icon">📊</span> Mandi Market Prices</div>
+        <p style="font-size:11px;color:var(--text-300);margin-bottom:14px;margin-top:-6px;">MSP &amp; APMC rates · Updated daily</p>
+        <div id="mandi-list"></div>
+        <div class="mandi-source">Source: APMC / e-NAM</div>
+      </div>
     </div>
   </section>
 
@@ -1021,12 +1125,8 @@
     <div class="page-header">
       <div>
         <h2>Farm AI Chat <span class="tag tag-ai">LLM Ready</span></h2>
-        <p>Conversational assistant for crop advice, disease management & market info</p>
+        <p>Conversational assistant for crop advice, disease management &amp; market info</p>
       </div>
-    </div>
-
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>POST /api/chat/message</code> · Send {message, history} · Receive {reply} · Stream supported
     </div>
 
     <div class="chat-wrap">
@@ -1035,11 +1135,16 @@
         Farm AI Assistant · Expert in Indian Agriculture
       </div>
       <div class="chat-messages" id="chat-msgs">
-        <div class="msg-row">
-          <div class="msg-avatar">🌿</div>
-          <div class="msg-bubble">
-            Sat Sri Akal! 🙏 I'm your Farm AI assistant. Ask me anything about crops, irrigation, diseases, fertilisers, market prices, or government schemes.<br><br>
-            <em style="font-size:12px;opacity:0.7">Powered by Gemini / OpenAI. Type a question below to get started.</em>
+        <!-- suggestion cards (shown until first message) -->
+        <div class="chat-suggestions" id="chat-suggestions">
+          <div class="chat-suggest-icon">🤖</div>
+          <div class="chat-suggest-title">Agro Mind AI</div>
+          <div class="chat-suggest-sub">Your expert advisor for Indian agriculture — ask anything below</div>
+          <div class="chat-suggest-grid">
+            <button class="chat-suggest-btn" onclick="quickMsg('How much fertiliser should I apply for wheat in December?')">🌾 How much fertiliser for wheat in December?</button>
+            <button class="chat-suggest-btn" onclick="quickMsg('What is the MSP for rice this year?')">💰 What is the MSP for rice this year?</button>
+            <button class="chat-suggest-btn" onclick="quickMsg('How do I treat leaf blight in cotton?')">🍃 How do I treat leaf blight in cotton?</button>
+            <button class="chat-suggest-btn" onclick="quickMsg('Recommend intercropping for mustard in Punjab')">🌻 Recommend intercropping for mustard</button>
           </div>
         </div>
       </div>
@@ -1064,14 +1169,10 @@
   <section class="page" id="page-sensors">
     <div class="page-header">
       <div>
-        <h2>Sensors & Data</h2>
-        <p>Live readings from all field IoT sensors</p>
+        <h2>Sensors &amp; Data</h2>
+        <p>Live readings from all field IoT sensors · real-time via WebSocket</p>
       </div>
-      <button class="btn btn-secondary" onclick="showToast('📥 Exporting CSV... GET /api/sensors/export')">📥 Export CSV</button>
-    </div>
-
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>GET /api/sensors/live</code> · Polling every 30s · Replace mock values below with real readings
+      <button class="btn btn-secondary" onclick="exportSensorCSV()">📥 Export CSV</button>
     </div>
 
     <div class="grid-3">
@@ -1096,8 +1197,15 @@
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="title-icon">📡</span> Sensor Status</div>
+      <div class="card-title"><span class="title-icon">📡</span> Sensor Status <span style="font-size:11.5px;font-weight:400;color:var(--text-300);margin-left:4px">· click a sensor to view history</span></div>
       <div id="sensor-list"></div>
+    </div>
+
+    <!-- Sensor history chart (shown when a sensor is selected) -->
+    <div class="sensor-history-wrap" id="sensor-history-wrap">
+      <div class="sensor-history-title" id="sensor-history-title">History</div>
+      <svg class="history-chart-svg" id="history-svg" height="160" viewBox="0 0 800 160" preserveAspectRatio="none"></svg>
+      <div class="history-legend" id="history-legend"></div>
     </div>
   </section>
 
@@ -1150,12 +1258,25 @@
         </div>
       </div>
     </div>
+
+    <!-- Farm Location Map -->
+    <div class="card" style="margin-top:0;">
+      <div class="card-title"><span class="title-icon">🗺️</span> Farm Location <span style="font-size:11.5px;font-weight:400;color:var(--text-300);margin-left:4px">· drag the pin to set your exact farm location</span></div>
+      <div id="farm-map"></div>
+      <div style="margin-top:10px;display:flex;gap:12px;font-size:12px;color:var(--text-300);">
+        <span>Lat: <strong id="map-lat">30.9000</strong></span>
+        <span>Lng: <strong id="map-lng">75.8500</strong></span>
+      </div>
+    </div>
   </section>
 
 </div><!-- /main -->
 
-<!-- TOAST -->
+<!-- Toast -->
 <div id="toast"></div>
+
+<!-- Leaflet JS (farm map) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLc=" crossorigin=""></script>
 
 <!-- ════════════════════════════════════
      JAVASCRIPT
@@ -1223,6 +1344,13 @@ const MOCK = {
     { id: 'S-06', field: 'Weather', info: 'Temp 28°C · Humidity 62% · Wind 8 km/h', status: 'badge-online', label: 'Online' },
   ],
 
+  mandiPrices: [
+    { crop: 'Wheat',   price: '₹2,275/qtl', trend: '↑ +₹45',  dir: 'up' },
+    { crop: 'Rice',    price: '₹2,183/qtl', trend: '↔ Stable', dir: 'flat' },
+    { crop: 'Cotton',  price: '₹6,620/qtl', trend: '↑ +₹120', dir: 'up' },
+    { crop: 'Mustard', price: '₹5,650/qtl', trend: '↓ −₹30',  dir: 'down' },
+  ],
+
   chatMocks: [
     'Based on Punjab conditions, wheat benefits from DAP at sowing (120 kg/ha) and urea in two splits — first at tillering (60 kg/ha) and again at boot stage. Top-dressing with sulphur 10 kg/ha also improves grain protein.',
     'Leaf blight (Alternaria triticina) should be treated with Mancozeb 75 WP @ 2.5 g/litre or Propiconazole @ 1 ml/litre. Spray when humidity is high and avoid irrigating overhead. Remove and destroy infected leaves.',
@@ -1277,7 +1405,7 @@ function nav(id, el) {
   else document.getElementById('bn-more').classList.add('active');
 
   /* Load page-specific data on navigation */
-  if (id === 'settings') loadSettings();
+  if (id === 'settings') { loadSettings(); setTimeout(initFarmMap, 100); }
 
   /* Close sidebar on mobile after navigation */
   closeSidebar();
@@ -1360,13 +1488,17 @@ function renderDiseaseHistory(data) {
 }
 
 /* ── RENDER: SENSORS ── */
+let selectedSensor = null;
 function renderSensors(data) {
   const items = data || MOCK.sensors;
   document.getElementById('sensor-list').innerHTML =
     items.map(s => `
-      <div class="sched-row">
-        <div class="sched-name">${s.id} · ${s.field}</div>
-        <div class="sched-meta">${s.info}</div>
+      <div class="sensor-card" id="sc-${s.id}" onclick="toggleSensorHistory('${s.id}')">
+        <div class="sensor-card-left">
+          <div class="sensor-card-id">${s.id}</div>
+          <div class="sensor-card-field">${s.field}</div>
+          <div class="sensor-card-info">${s.info}</div>
+        </div>
         <div class="badge ${s.status}">${s.label}</div>
       </div>`).join('');
 }
@@ -1381,6 +1513,7 @@ async function loadDashboard() {
     renderAlerts(data.alerts);
     renderChart(data.waterChart);
     renderSchedule(data.schedule);
+    renderDashSchedule(data.schedule);
     renderDiseaseHistory(data.diseaseHistory);
     renderSensors(data.sensors);
   } catch (err) {
@@ -1389,9 +1522,11 @@ async function loadDashboard() {
     renderAlerts();
     renderChart();
     renderSchedule();
+    renderDashSchedule();
     renderDiseaseHistory();
     renderSensors();
   }
+  renderMandiPrices();
   updateClock();
 }
 
@@ -1543,6 +1678,7 @@ async function sendMsg() {
   if (!msg || btn.disabled) return;
   input.value = '';
 
+  _hideChatSuggestions();
   addBubble(msg, 'user');
   chatHistory.push({ role:'user', content: msg });
   btn.disabled = true;
@@ -1685,6 +1821,173 @@ function updateClock() {
   el.textContent = 'updated ' + now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
 }
 setInterval(updateClock, 60000);
+
+/* ── RENDER: MANDI PRICES ── */
+function renderMandiPrices(data) {
+  const items = data || MOCK.mandiPrices;
+  document.getElementById('mandi-list').innerHTML =
+    items.map(m => `
+      <div class="mandi-row">
+        <div class="mandi-crop">${m.crop}</div>
+        <div style="text-align:right">
+          <div class="mandi-price">${m.price}</div>
+          <div class="mandi-trend ${m.dir}">${m.trend}</div>
+        </div>
+      </div>`).join('');
+}
+
+/* ── RENDER: DASHBOARD SCHEDULE (duplicate in dashboard section) ── */
+function renderDashSchedule(data) {
+  const el = document.getElementById('dash-schedule-list');
+  if (!el) return;
+  const items = data || MOCK.schedule;
+  el.innerHTML = items.map(r => `
+    <div class="sched-row">
+      <div class="sched-name">${r.name}</div>
+      <div class="sched-meta">${r.meta}</div>
+      <div class="badge ${r.badge}">${r.label}</div>
+    </div>`).join('');
+}
+
+/* ── SENSOR HISTORY CHART ── */
+// Generates demo time-series data for a sensor
+function _genSensorHistory(sensorId) {
+  const now = Date.now();
+  const baseMap = { 'S-01':72, 'S-02':85, 'S-03':41, 'S-04':63, 'S-05':29, 'S-06':null };
+  const tempMap  = { 'S-01':23, 'S-02':25, 'S-03':27, 'S-04':24, 'S-05':28, 'S-06':28 };
+  const humMap   = { 'S-06':62 };
+  const baseMoisture = baseMap[sensorId];
+  const baseTemp     = tempMap[sensorId] || 25;
+  const baseHumidity = humMap[sensorId] || null;
+  return Array.from({ length: 24 }, (_, i) => ({
+    time:     new Date(now - (23 - i) * 60 * 60 * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }),
+    moisture: baseMoisture != null ? Math.max(5, Math.min(100, baseMoisture + Math.round((Math.random() - 0.5) * 10))) : null,
+    temp:     parseFloat((baseTemp + (Math.random() - 0.5) * 3).toFixed(1)),
+    humidity: baseHumidity != null ? Math.max(10, Math.min(100, Math.round(baseHumidity + (Math.random() - 0.5) * 8))) : null,
+  }));
+}
+
+// Build a simple SVG polyline chart from data
+function _buildSVGLine(points, color, svgW, svgH, min, max) {
+  if (!points.some(p => p != null)) return '';
+  const range = max - min || 1;
+  const coords = points.map((v, i) => {
+    const x = (i / (points.length - 1)) * svgW;
+    const y = svgH - ((v - min) / range) * svgH;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).filter((_, i) => points[i] != null).join(' ');
+  return `<polyline points="${coords}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+}
+
+async function toggleSensorHistory(sensorId) {
+  const wrap = document.getElementById('sensor-history-wrap');
+  // Deselect previously selected card
+  document.querySelectorAll('.sensor-card').forEach(c => c.classList.remove('selected'));
+
+  if (selectedSensor === sensorId) {
+    selectedSensor = null;
+    wrap.classList.remove('show');
+    return;
+  }
+  selectedSensor = sensorId;
+  document.getElementById('sc-' + sensorId)?.classList.add('selected');
+  document.getElementById('sensor-history-title').textContent = `Sensor ${sensorId} — 24 h History`;
+
+  let readings = null;
+  try {
+    const res = await fetch(`/api/sensors/history/${sensorId}?limit=24`);
+    if (res.ok) { const d = await res.json(); readings = d.readings; }
+  } catch (_) { /* use demo data */ }
+
+  const points = readings
+    ? readings.slice().reverse().map(r => ({ time: new Date(r.recordedAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:false }), moisture: r.moisture, temp: r.temperature, humidity: r.humidity }))
+    : _genSensorHistory(sensorId);
+
+  const svgW = 800, svgH = 140;
+  const temps     = points.map(p => p.temp);
+  const moistures = points.map(p => p.moisture);
+  const humids    = points.map(p => p.humidity);
+
+  const allVals = [...temps, ...moistures, ...humids].filter(v => v != null);
+  const dataMin = Math.floor(Math.min(...allVals) - 5);
+  const dataMax = Math.ceil(Math.max(...allVals) + 5);
+
+  // X-axis labels (6 evenly spaced)
+  const xLabels = Array.from({ length: 6 }, (_, i) => {
+    const idx = Math.round(i * (points.length - 1) / 5);
+    return `<text x="${(idx / (points.length - 1) * svgW).toFixed(1)}" y="${svgH + 18}" text-anchor="middle" font-size="10" fill="#7a9e80">${points[idx].time}</text>`;
+  }).join('');
+
+  // Y-axis grid lines
+  const gridLines = Array.from({ length: 4 }, (_, i) => {
+    const y = svgH - (i / 3) * svgH;
+    const val = Math.round(dataMin + (i / 3) * (dataMax - dataMin));
+    return `<line x1="0" y1="${y.toFixed(1)}" x2="${svgW}" y2="${y.toFixed(1)}" stroke="#d4e8d6" stroke-width="0.8"/>
+            <text x="-4" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#adc4b0">${val}</text>`;
+  }).join('');
+
+  const svgContent =
+    `<svg viewBox="-30 -10 ${svgW + 40} ${svgH + 35}" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:DM Sans,sans-serif">
+      ${gridLines}
+      ${_buildSVGLine(temps,     '#e6a817', svgW, svgH, dataMin, dataMax)}
+      ${_buildSVGLine(moistures, '#4caf60', svgW, svgH, dataMin, dataMax)}
+      ${_buildSVGLine(humids,    '#2563a8', svgW, svgH, dataMin, dataMax)}
+      ${xLabels}
+    </svg>`;
+
+  document.getElementById('sensor-history-wrap').innerHTML =
+    `<div class="sensor-history-title">Sensor ${sensorId} — 24 h History</div>
+     ${svgContent}
+     <div class="history-legend">
+       ${temps.some(v => v != null)     ? '<div class="legend-item"><div class="legend-dot" style="background:#e6a817"></div>Temperature (°C)</div>' : ''}
+       ${moistures.some(v => v != null) ? '<div class="legend-item"><div class="legend-dot" style="background:#4caf60"></div>Moisture (%)</div>' : ''}
+       ${humids.some(v => v != null)    ? '<div class="legend-item"><div class="legend-dot" style="background:#2563a8"></div>Humidity (%)</div>' : ''}
+     </div>`;
+  wrap.classList.add('show');
+}
+
+/* ── CHAT SUGGESTIONS HIDE ── */
+function _hideChatSuggestions() {
+  const el = document.getElementById('chat-suggestions');
+  if (el) el.style.display = 'none';
+}
+
+/* ── SENSOR CSV EXPORT ── */
+async function exportSensorCSV() {
+  try {
+    const res = await fetch('/api/sensors/export');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'sensor-data.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('📥 CSV exported successfully');
+  } catch (err) {
+    console.warn('[sensors/export]', err.message);
+    showToast('📥 Export unavailable — backend required');
+  }
+}
+
+/* ── LEAFLET FARM MAP ── */
+let _map = null;
+function initFarmMap() {
+  if (_map) return; // already initialised
+  const mapEl = document.getElementById('farm-map');
+  if (!mapEl || typeof L === 'undefined') return;
+  _map = L.map('farm-map').setView([30.9, 75.85], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+    maxZoom: 19,
+  }).addTo(_map);
+  const marker = L.marker([30.9, 75.85], { draggable: true }).addTo(_map);
+  marker.bindPopup('<strong>Singh\'s Farm</strong><br>Ludhiana, Punjab').openPopup();
+  function updateCoords(latlng) {
+    document.getElementById('map-lat').textContent = latlng.lat.toFixed(4);
+    document.getElementById('map-lng').textContent = latlng.lng.toFixed(4);
+  }
+  marker.on('dragend', e => updateCoords(e.target.getLatLng()));
+  _map.on('click', e => { marker.setLatLng(e.latlng); updateCoords(e.latlng); });
+}
 
 /* ── INIT ── */
 loadDashboard();
