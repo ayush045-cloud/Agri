@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../prisma';
+import { getIO } from '../services/socketService';
 
 const router = Router();
 
@@ -162,6 +163,8 @@ router.post('/reading', async (req: Request, res: Response) => {
       where: { id: sensor.id },
       data: { lastSeenAt: new Date(), status: 'online' },
     });
+
+    try { getIO().emit('sensor:update', { deviceId, reading }); } catch { /* socket not ready */ }
 
     res.status(201).json({ success: true, reading });
   } catch (err) {

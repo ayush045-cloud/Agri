@@ -53,7 +53,7 @@ router.post('/', async (req: Request, res: Response) => {
     const user = await prisma.user.upsert({
       where: { email: 'admin@agromind.local' },
       update: {},
-      create: { email: 'admin@agromind.local', name: farmName ?? 'Farm Owner' },
+      create: { email: 'admin@agromind.local', name: farmName ?? 'Farm Owner', password: '' },
     });
 
     // Update or create farm
