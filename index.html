@@ -1319,6 +1319,7 @@ function renderAlerts(data) {
 /* ── RENDER: BAR CHART ── */
 function renderChart(data) {
   const items = data || MOCK.waterChart;
+  if (!items.length) { document.getElementById('bar-chart').innerHTML = ''; return; }
   const vals = items.map(d => d.val);
   const mx   = Math.max(...vals, 1);
   document.getElementById('bar-chart').innerHTML =
@@ -1655,8 +1656,8 @@ async function loadSettings() {
     document.getElementById('s-sms').checked      = !!settings.sms;
     document.getElementById('s-mandi').checked    = !!settings.mandi;
     // Normalise waterSource value to match the <select> option text
-    const wsMap = { borewell:'Borewell', canal:'Canal Irrigation', rainwater:'Rainwater', mixed:'Borewell' };
-    const ws = wsMap[(settings.waterSource || '').toLowerCase()] || settings.waterSource;
+    const wsMap = { borewell:'Borewell', canal:'Canal Irrigation', rainwater:'Rainwater' };
+    const ws = wsMap[(settings.waterSource || '').toLowerCase()];
     if (ws) {
       const sel = document.getElementById('s-water');
       const opt = Array.from(sel.options).find(o => o.text === ws || o.value === ws);
