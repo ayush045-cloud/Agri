@@ -6,6 +6,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import rateLimit from 'express-rate-limit';
 import { prisma } from '../prisma';
+import { getAiServiceUrl } from '../utils/aiServiceUrl';
 
 const router = Router();
 
@@ -85,7 +86,7 @@ router.post('/analyse', uploadLimiter, handleUpload, async (req: Request, res: R
   const imageUrl = `/uploads/${req.file.filename}`;
 
   try {
-    const aiServiceUrl = process.env.AI_SERVICE_URL ?? 'http://localhost:8000';
+    const aiServiceUrl = getAiServiceUrl();
 
     // Build multipart form for the AI service
     const form = new FormData();

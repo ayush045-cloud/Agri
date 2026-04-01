@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import { prisma } from '../prisma';
+import { getAiServiceUrl } from '../utils/aiServiceUrl';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.post('/recommend', async (req: Request, res: Response) => {
   try {
     const { soil, ph, rainfall, temp, region, season, nitrogen, water } = req.body;
 
-    const aiServiceUrl = process.env.AI_SERVICE_URL ?? 'http://localhost:8000';
+    const aiServiceUrl = getAiServiceUrl();
     const aiResponse = await axios.post<AiCropResponse>(
       `${aiServiceUrl}/crops/recommend`,
       { soil, ph, rainfall, temp, region, season, nitrogen, water },
