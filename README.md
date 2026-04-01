@@ -8,17 +8,17 @@ A full-stack platform for Indian farmers combining IoT sensor monitoring, AI-pow
 │  Dashboard · Disease · Crops · Chat · Sensors       │
 └────────────────────┬────────────────────────────────┘
                      │ REST
-┌────────────────────▼────────────────────────────────┐
-│         backend/  (Node.js · Express · TypeScript)  │
-│  GET  /api/dashboard          GET  /api/sensors/live│
-│  POST /api/disease/analyse    GET  /api/sensors/export
-│  POST /api/chat/message       POST /api/sensors/reading
-│  POST /api/crops/recommend    GET  /api/irrigation/schedule
-│  POST /api/settings           POST /api/irrigation/accept
-└────────┬───────────────────────────────┬────────────┘
+┌────────────────────▼───────────────────────────────────────┐
+│         backend/  (Node.js · Express · TypeScript)         │
+│  GET  /api/dashboard          GET  /api/sensors/live       │
+│  POST /api/disease/analyse    GET  /api/sensors/export     │
+│  POST /api/chat/message       POST /api/sensors/reading    │
+│  POST /api/crops/recommend    GET  /api/irrigation/schedule│
+│  POST /api/settings           POST /api/irrigation/accept  │
+└────────┬───────────────────────────────┬───────────────────┘
          │ Prisma ORM                    │ HTTP
          │                               │
-┌────────▼──────────┐      ┌─────────────▼──────────────┐
+┌────────▼──────────┐      ┌─────────────▼────────────────┐
 │  PostgreSQL DB    │      │  ai-service/ (Python/FastAPI)│
 │  Users · Farms    │      │  POST /disease/detect        │
 │  Fields · Sensors │      │  POST /crops/recommend       │
@@ -146,9 +146,3 @@ Managed by **Prisma** (`backend/prisma/schema.prisma`):
 - **DiseaseLog** — image URL, detection result, confidence score
 - **IrrigationLog** — scheduled/completed irrigation events
 - **UserSettings** — notification preferences, language, API URL
-
----
-
-## License
-
-MIT
