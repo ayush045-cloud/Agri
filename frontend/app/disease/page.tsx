@@ -19,22 +19,21 @@ export default function DiseasePage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  async function analyse(file: File) {
+  const analyse = useCallback(async (file: File) => {
     setAnalysing(true); setResult(null); setError('');
     const fd = new FormData(); fd.append('image', file);
     try {
       const r = await api.postForm<DiseaseResult>('/api/disease/analyse', fd);
       setResult(r);
     } catch { setError('Analysis failed. Please try again.'); } finally { setAnalysing(false); }
-  }
+  }, []);
 
   const handleFile = useCallback((file: File) => {
     const reader = new FileReader();
     reader.onload = e => setPreview(e.target?.result as string);
     reader.readAsDataURL(file);
     analyse(file);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [analyse]);
 
   function onDrop(e: React.DragEvent) {
     e.preventDefault(); setDragging(false);
