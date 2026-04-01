@@ -16,12 +16,16 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
+  password  String
+  role      String   @default("farmer")
   phone     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   farms     Farm[]
   settings  UserSettings?
+
+  @@map("users")
 }
 
 model Farm {

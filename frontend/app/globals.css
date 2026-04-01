@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+@import "tailwindcss";
+@import 'leaflet/dist/leaflet.css';
+
+@theme {
+  --color-green-900: #0f2412;
+  --color-green-800: #1a3a1f;
+  --color-green-700: #245229;
+  --color-green-600: #2d6a35;
+  --color-green-500: #3d8b47;
+  --color-green-400: #4caf60;
+  --color-green-200: #a5d6a7;
+  --color-green-100: #e8f5eb;
+  --color-amber-500: #e6a817;
+  --color-amber-100: #fdf6e3;
+  --color-blue-600: #2563a8;
+  --color-red-600: #c0392b;
+  --color-bg: #f4f9f4;
+  --color-surface: #ffffff;
+  --color-border: #d4e8d6;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'DM Serif Display', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: #f4f9f4; color: #1a2b1c; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4e8d6; border-radius: 10px; }

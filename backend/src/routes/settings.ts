@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { randomBytes } from 'crypto';
 import { prisma } from '../prisma';
 
 const router = Router();
@@ -53,7 +54,7 @@ router.post('/', async (req: Request, res: Response) => {
     const user = await prisma.user.upsert({
       where: { email: 'admin@agromind.local' },
       update: {},
-      create: { email: 'admin@agromind.local', name: farmName ?? 'Farm Owner' },
+      create: { email: 'admin@agromind.local', name: farmName ?? 'Farm Owner', password: randomBytes(32).toString('hex') },
     });
 
     // Update or create farm

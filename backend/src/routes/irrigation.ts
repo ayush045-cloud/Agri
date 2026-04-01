@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../prisma';
+import { getIO } from '../services/socketService';
 
 const router = Router();
 
@@ -81,6 +82,8 @@ router.post('/run', async (req: Request, res: Response) => {
         waterUsedL: waterUsedL ? parseFloat(waterUsedL) : undefined,
       },
     });
+
+    try { getIO().emit('pump:status', { fieldId, status: 'active', logId: log.id }); } catch { /* socket not ready */ }
 
     res.status(201).json({ success: true, log });
   } catch (err) {

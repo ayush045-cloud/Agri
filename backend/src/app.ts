@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 
+import authRouter from './routes/auth';
 import dashboardRouter from './routes/dashboard';
 import diseaseRouter from './routes/disease';
 import chatRouter from './routes/chat';
@@ -32,6 +33,7 @@ app.use('/uploads', express.static(uploadDir));
 app.use(express.static(path.resolve(__dirname, '../../')));
 
 // ── API Routes ───────────────────────────────────────────────────────────────
+app.use('/api/auth', authRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/disease', diseaseRouter);
 app.use('/api/chat', chatRouter);
