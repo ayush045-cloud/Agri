@@ -29,7 +29,8 @@ async function checkWeather(lat: number, lon: number): Promise<WeatherResult> {
 }
 
 export function startIrrigationEngine(): void {
-  cron.schedule('*/15 * * * *', async () => {
+  const schedule = process.env.IRRIGATION_CRON ?? '*/15 * * * *';
+  cron.schedule(schedule, async () => {
     console.log('[irrigationEngine] Running irrigation check…');
     try {
       const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
