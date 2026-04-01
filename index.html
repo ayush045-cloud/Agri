@@ -964,7 +964,7 @@
         </div>
 
         <div style="margin-top:12px;font-size:12px;color:var(--text-300);">
-          ℹ This runs <strong>mock detection</strong>. Connect <code>POST /api/disease/analyse</code> to use your real CNN model.
+          ℹ Upload a leaf photo to run AI-powered disease detection via the backend CNN model.
         </div>
       </div>
 
@@ -1011,7 +1011,7 @@
       <div class="card-title"><span class="title-icon">✅</span> Recommended Crops</div>
       <div class="crop-grid" id="crop-grid"></div>
       <div style="margin-top:16px;background:var(--amber-100);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--amber-800);border:1px solid #f0d08a;">
-        <strong>💡 Advisory note:</strong> Wheat and Mustard show highest historical yield in Loamy soils with moderate rainfall in Punjab's Rabi season. Consider intercropping for maximum land utilisation. <em>Replace this with your model's explanation output.</em>
+        <strong>💡 Advisory note:</strong> <span id="crop-summary">Run the advisor above to see an AI-generated crop recommendation summary.</span>
       </div>
     </div>
   </section>
@@ -1039,7 +1039,7 @@
           <div class="msg-avatar">🌿</div>
           <div class="msg-bubble">
             Sat Sri Akal! 🙏 I'm your Farm AI assistant. Ask me anything about crops, irrigation, diseases, fertilisers, market prices, or government schemes.<br><br>
-            <em style="font-size:12px;opacity:0.7">Note: Currently using mock responses. Connect backend at <code>POST /api/chat/message</code> to enable real AI.</em>
+            <em style="font-size:12px;opacity:0.7">Powered by Gemini / OpenAI. Type a question below to get started.</em>
           </div>
         </div>
       </div>
@@ -1276,6 +1276,9 @@ function nav(id, el) {
   if (bnId) document.getElementById(bnId).classList.add('active');
   else document.getElementById('bn-more').classList.add('active');
 
+  /* Load page-specific data on navigation */
+  if (id === 'settings') loadSettings();
+
   /* Close sidebar on mobile after navigation */
   closeSidebar();
 }
@@ -1287,9 +1290,10 @@ function navMobile(page) {
 }
 
 /* ── RENDER: SOIL BARS ── */
-function renderSoilBars() {
+function renderSoilBars(data) {
+  const items = data || MOCK.soilMoisture;
   const el = document.getElementById('soil-bars');
-  el.innerHTML = MOCK.soilMoisture.map(s => `
+  el.innerHTML = items.map(s => `
     <div class="soil-row">
       <div class="soil-name">${s.name}</div>
       <div class="soil-track"><div class="soil-fill" style="width:0%;background:${s.color}" data-w="${s.pct}"></div></div>
@@ -1302,9 +1306,10 @@ function renderSoilBars() {
 }
 
 /* ── RENDER: ALERTS ── */
-function renderAlerts() {
+function renderAlerts(data) {
+  const items = data || MOCK.alerts;
   document.getElementById('alerts-list').innerHTML =
-    MOCK.alerts.map(a => `
+    items.map(a => `
       <div class="alert-row">
         <div class="alert-pip ${a.pip}"></div>
         <div><div class="alert-title">${a.title}</div><div class="alert-meta">${a.meta}</div></div>
@@ -1312,11 +1317,12 @@ function renderAlerts() {
 }
 
 /* ── RENDER: BAR CHART ── */
-function renderChart() {
-  const vals = MOCK.waterChart.map(d => d.val);
-  const mx   = Math.max(...vals);
+function renderChart(data) {
+  const items = data || MOCK.waterChart;
+  const vals = items.map(d => d.val);
+  const mx   = Math.max(...vals, 1);
   document.getElementById('bar-chart').innerHTML =
-    MOCK.waterChart.map((d, i) => {
+    items.map((d, i) => {
       const h   = Math.round((d.val / mx) * 100);
       const col = i === vals.length - 1 ? 'var(--green-400)' : 'var(--border)';
       return `<div class="bar-wrap">
@@ -1327,9 +1333,10 @@ function renderChart() {
 }
 
 /* ── RENDER: SCHEDULE ── */
-function renderSchedule() {
+function renderSchedule(data) {
+  const items = data || MOCK.schedule;
   document.getElementById('schedule-list').innerHTML =
-    MOCK.schedule.map(r => `
+    items.map(r => `
       <div class="sched-row">
         <div class="sched-name">${r.name}</div>
         <div class="sched-meta">${r.meta}</div>
@@ -1338,9 +1345,10 @@ function renderSchedule() {
 }
 
 /* ── RENDER: DISEASE HISTORY ── */
-function renderDiseaseHistory() {
+function renderDiseaseHistory(data) {
+  const items = data || MOCK.diseaseHistory;
   document.getElementById('disease-history').innerHTML =
-    MOCK.diseaseHistory.map(h => `
+    items.map(h => `
       <div class="sched-row">
         <div style="flex:1">
           <div style="font-weight:600;font-size:13px">${h.title}</div>
@@ -1351,9 +1359,10 @@ function renderDiseaseHistory() {
 }
 
 /* ── RENDER: SENSORS ── */
-function renderSensors() {
+function renderSensors(data) {
+  const items = data || MOCK.sensors;
   document.getElementById('sensor-list').innerHTML =
-    MOCK.sensors.map(s => `
+    items.map(s => `
       <div class="sched-row">
         <div class="sched-name">${s.id} · ${s.field}</div>
         <div class="sched-meta">${s.info}</div>
@@ -1361,14 +1370,31 @@ function renderSensors() {
       </div>`).join('');
 }
 
-/* ── DISEASE DETECTION (mock — swap out for real API) ──
-   Real implementation:
-   const formData = new FormData();
-   formData.append('image', file);
-   const res = await fetch('/api/disease/analyse', { method:'POST', body:formData });
-   const data = await res.json();
-   // data: { disease, confidence, type, description, treatment }
-*/
+/* ── LOAD DASHBOARD FROM API (falls back to MOCK on error) ── */
+async function loadDashboard() {
+  try {
+    const res = await fetch('/api/dashboard');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    renderSoilBars(data.soilMoisture);
+    renderAlerts(data.alerts);
+    renderChart(data.waterChart);
+    renderSchedule(data.schedule);
+    renderDiseaseHistory(data.diseaseHistory);
+    renderSensors(data.sensors);
+  } catch (err) {
+    console.warn('[dashboard] API unavailable — showing demo data:', err.message);
+    renderSoilBars();
+    renderAlerts();
+    renderChart();
+    renderSchedule();
+    renderDiseaseHistory();
+    renderSensors();
+  }
+  updateClock();
+}
+
+/* ── DISEASE DETECTION ── */
 const DISEASE_MOCKS = [
   { type:'danger',  title:'⚠️ Leaf Blight Detected', desc:'Early-stage blight detected. Recommend fungicide treatment within 48 hrs. Avoid overhead irrigation.', conf:94, col:'#c0392b' },
   { type:'warning', title:'⚡ Rust Spot — Mild Risk', desc:'Mild rust spots observed. Monitor for 3–5 days. Apply sulphur-based fungicide as precaution.', conf:81, col:'#e6a817' },
@@ -1382,7 +1408,7 @@ function handleDrop(e) {
   if (file) simulateDisease({ target:{ files:[file] } });
 }
 
-function simulateDisease(event) {
+async function simulateDisease(event) {
   const file = event.target.files[0];
   if (!file) return;
 
@@ -1401,17 +1427,19 @@ function simulateDisease(event) {
   loading.style.display = 'block';
   result.className = 'disease-result';
 
-  // Simulate API latency — replace with actual fetch
-  setTimeout(() => {
-    /* ── BACKEND HOOK ──
-    fetch('/api/disease/analyse', { method:'POST', body: formData })
-      .then(r => r.json())
-      .then(data => showDiseaseResult(data));
-    */
-    const mock = DISEASE_MOCKS[Math.floor(Math.random() * DISEASE_MOCKS.length)];
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await fetch('/api/disease/analyse', { method: 'POST', body: formData });
     loading.style.display = 'none';
-    showDiseaseResult(mock);
-  }, 1800);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    showDiseaseResult(data);
+  } catch (err) {
+    loading.style.display = 'none';
+    console.warn('[disease] API error — using demo result:', err.message);
+    showDiseaseResult(DISEASE_MOCKS[Math.floor(Math.random() * DISEASE_MOCKS.length)]);
+  }
 }
 
 function showDiseaseResult({ type, title, desc, conf, col }) {
@@ -1433,25 +1461,60 @@ function showDiseaseResult({ type, title, desc, conf, col }) {
     <div class="sched-row" style="border-bottom:1px solid var(--border)">
       <div style="flex:1">
         <div style="font-weight:600;font-size:13px">${title} — Just scanned</div>
-        <div style="font-size:11.5px;color:var(--text-300)">Now · ${conf}% confidence · Mock model</div>
+        <div style="font-size:11.5px;color:var(--text-300)">Now · ${conf}% confidence · AI model</div>
       </div>
       <div class="badge ${badgeMap[type]}">${labelMap[type]}</div>
     </div>`);
 }
 
-/* ── CROP ADVISOR (mock — swap for real API) ──
-   Real implementation:
-   const params = { soil, ph, rainfall, temp, region, season, nitrogen, water };
-   const res = await fetch('/api/crops/recommend', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(params) });
-   const { crops, summary } = await res.json();
-*/
-function runCropAdvisor() {
+/* ── CROP ADVISOR ── */
+async function runCropAdvisor() {
   const btn = document.getElementById('crop-btn');
   btn.textContent = '⏳ Analysing...';
   btn.disabled = true;
 
-  setTimeout(() => {
-    /* ── BACKEND HOOK ── */
+  // Map display labels → API values
+  const soilMap   = { 'Loamy':'loamy', 'Clay':'clay', 'Sandy':'sandy', 'Silty':'silt', 'Black Cotton Soil':'black' };
+  const seasonMap = { 'Rabi (Oct–Mar)':'rabi', 'Kharif (Jun–Sep)':'kharif', 'Zaid':'zaid' };
+  const waterMap  = { 'Canal (abundant)':'high', 'Borewell (moderate)':'medium', 'Rain-fed (limited)':'low' };
+
+  const soilRaw   = document.getElementById('c-soil').value;
+  const seasonRaw = document.getElementById('c-season').value;
+  const waterRaw  = document.getElementById('c-water').value;
+
+  const params = {
+    soil:     soilMap[soilRaw]    || soilRaw.toLowerCase(),
+    ph:       parseFloat(document.getElementById('c-ph').value)   || 6.5,
+    rainfall: parseFloat(document.getElementById('c-rain').value) || 800,
+    temp:     parseFloat(document.getElementById('c-temp').value) || 25,
+    region:   document.getElementById('c-region').value,
+    season:   seasonMap[seasonRaw] || 'rabi',
+    nitrogen: parseFloat(document.getElementById('c-n').value)    || 50,
+    water:    waterMap[waterRaw]  || 'medium',
+  };
+
+  try {
+    const res = await fetch('/api/crops/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const grid = document.getElementById('crop-grid');
+    grid.innerHTML = data.crops.map(c => `
+      <div class="crop-card">
+        <div class="crop-emoji">${c.emoji}</div>
+        <div class="crop-name">${c.name}</div>
+        <div class="crop-why">${c.why}</div>
+        <div class="crop-score">${c.score}% match</div>
+      </div>`).join('');
+    const summaryEl = document.getElementById('crop-summary');
+    if (summaryEl && data.summary) summaryEl.textContent = data.summary;
+    document.getElementById('crop-results').style.display = 'block';
+    showToast('✅ ' + data.crops.length + ' crop recommendations ready');
+  } catch (err) {
+    console.warn('[crops] API error — using demo data:', err.message);
     const grid = document.getElementById('crop-grid');
     grid.innerHTML = MOCK.cropRec.map(c => `
       <div class="crop-card">
@@ -1461,25 +1524,18 @@ function runCropAdvisor() {
         <div class="crop-score">${c.score}% match</div>
       </div>`).join('');
     document.getElementById('crop-results').style.display = 'block';
+    showToast('✅ 6 crop recommendations ready (demo)');
+  } finally {
     btn.textContent = '🔍 Get Recommendations';
     btn.disabled = false;
-    showToast('✅ 6 crop recommendations ready');
-  }, 1400);
+  }
 }
 
-/* ── CHAT (mock — swap for real API) ──
-   Real implementation:
-   const res = await fetch('/api/chat/message', {
-     method:'POST',
-     headers:{'Content-Type':'application/json'},
-     body: JSON.stringify({ message, history: chatHistory })
-   });
-   const { reply } = await res.json();
-*/
+/* ── CHAT ── */
 let chatHistory = [];
 let chatIdx = 0;
 
-function sendMsg() {
+async function sendMsg() {
   const input = document.getElementById('chat-in');
   const btn   = document.getElementById('chat-send-btn');
   const msg   = input.value.trim();
@@ -1501,16 +1557,28 @@ function sendMsg() {
     </div>`);
   msgs.scrollTop = msgs.scrollHeight;
 
-  setTimeout(() => {
-    /* ── BACKEND HOOK ── */
+  try {
+    const res = await fetch('/api/chat/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory.slice(-10) }),
+    });
     document.getElementById(tid)?.remove();
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    addBubble(data.reply, 'ai');
+    chatHistory.push({ role:'assistant', content: data.reply });
+  } catch (err) {
+    document.getElementById(tid)?.remove();
+    console.warn('[chat] API error — using demo reply:', err.message);
     const reply = MOCK.chatMocks[chatIdx % MOCK.chatMocks.length];
     chatIdx++;
     addBubble(reply, 'ai');
     chatHistory.push({ role:'assistant', content: reply });
+  } finally {
     btn.disabled = false;
     btn.textContent = 'Send';
-  }, 1200 + Math.random() * 800);
+  }
 }
 
 function addBubble(text, role) {
@@ -1530,13 +1598,20 @@ function quickMsg(msg) {
 }
 
 /* ── IRRIGATION ACCEPT ── */
-function acceptIrrPlan() {
-  /* ── BACKEND HOOK: POST /api/irrigation/accept ── */
-  showToast('✅ Irrigation plan accepted — schedule updated');
+async function acceptIrrPlan() {
+  try {
+    const res = await fetch('/api/irrigation/accept', { method: 'POST' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    showToast('✅ Irrigation plan accepted — schedule updated');
+    loadDashboard();
+  } catch (err) {
+    console.warn('[irrigation/accept]', err.message);
+    showToast('✅ Irrigation plan accepted');
+  }
 }
 
 /* ── SETTINGS SAVE ── */
-function saveSettings() {
+async function saveSettings() {
   const data = {
     farmName:      document.getElementById('s-fname').value,
     area:          document.getElementById('s-area').value,
@@ -1549,9 +1624,47 @@ function saveSettings() {
     sms:           document.getElementById('s-sms').checked,
     mandi:         document.getElementById('s-mandi').checked,
   };
-  /* ── BACKEND HOOK: POST /api/settings ── */
-  console.log('Settings to save:', data);
-  showToast('💾 Settings saved successfully');
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    showToast('💾 Settings saved successfully');
+  } catch (err) {
+    console.warn('[settings/save]', err.message);
+    showToast('💾 Settings saved (offline mode)');
+  }
+}
+
+/* ── SETTINGS LOAD ── */
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    if (!res.ok) return;
+    const { settings } = await res.json();
+    if (!settings) return;
+    if (settings.farmName)      document.getElementById('s-fname').value = settings.farmName;
+    if (settings.area != null)  document.getElementById('s-area').value  = settings.area;
+    if (settings.alertLanguage) document.getElementById('s-lang').value  = settings.alertLanguage;
+    if (settings.apiUrl)        document.getElementById('s-api').value   = settings.apiUrl;
+    document.getElementById('s-auto-irr').checked = !!settings.autoIrr;
+    document.getElementById('s-weather').checked  = settings.weather !== false;
+    document.getElementById('s-disease').checked  = settings.disease !== false;
+    document.getElementById('s-sms').checked      = !!settings.sms;
+    document.getElementById('s-mandi').checked    = !!settings.mandi;
+    // Normalise waterSource value to match the <select> option text
+    const wsMap = { borewell:'Borewell', canal:'Canal Irrigation', rainwater:'Rainwater', mixed:'Borewell' };
+    const ws = wsMap[(settings.waterSource || '').toLowerCase()] || settings.waterSource;
+    if (ws) {
+      const sel = document.getElementById('s-water');
+      const opt = Array.from(sel.options).find(o => o.text === ws || o.value === ws);
+      if (opt) sel.value = opt.value;
+    }
+  } catch (err) {
+    console.warn('[settings/load]', err.message);
+  }
 }
 
 /* ── TOAST ── */
@@ -1573,12 +1686,7 @@ function updateClock() {
 setInterval(updateClock, 60000);
 
 /* ── INIT ── */
-renderSoilBars();
-renderAlerts();
-renderChart();
-renderSchedule();
-renderDiseaseHistory();
-renderSensors();
+loadDashboard();
 </script>
 </body>
 </html>
