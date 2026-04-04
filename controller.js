@@ -4,9 +4,12 @@ const API_BASE = (typeof window !== 'undefined' && typeof window.DEFAULT_API_BAS
   ? window.DEFAULT_API_BASE.replace(/\/+$/, '')
   : '';
 
+if (!API_BASE) {
+  console.warn('[api] DEFAULT_API_BASE not configured; using same-origin relative API paths.');
+}
+
 function apiUrl(path) {
   if (!path || typeof path !== 'string') return API_BASE;
-  if (/^https?:\/\//i.test(path)) return path;
   return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
