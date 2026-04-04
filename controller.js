@@ -1,5 +1,22 @@
 'use strict';
 
+const API_BASE = (typeof window !== 'undefined' && typeof window.DEFAULT_API_BASE === 'string')
+  ? window.DEFAULT_API_BASE.replace(/\/+$/, '')
+  : '';
+
+if (!API_BASE) {
+  console.warn('[api] DEFAULT_API_BASE not configured; using same-origin relative API paths.');
+}
+
+function apiUrl(path) {
+  if (!path || typeof path !== 'string') return API_BASE;
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path) || path.includes('://')) {
+    console.warn('[api] Rejecting absolute URL path input:', path);
+    return API_BASE;
+  }
+  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
 /* ── MOCK DATA ── (replace with API calls) */
 const MOCK = {
   soilMoisture: [
@@ -211,7 +228,7 @@ function renderSensors(data) {
 /* ── LOAD DASHBOARD FROM API (falls back to MOCK on error) ── */
 async function loadDashboard() {
   try {
-    const res = await fetch('/api/dashboard');
+    const res = await fetch(apiUrl('/api/dashboard'));
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     renderSoilBars(data.soilMoisture);
@@ -268,7 +285,7 @@ async function simulateDisease(event) {
   try {
     const formData = new FormData();
     formData.append('image', file);
-    const res = await fetch('/api/disease/analyse', { method: 'POST', body: formData });
+    const res = await fetch(apiUrl('/api/disease/analyse'), { method: 'POST', body: formData });
     loading.style.display = 'none';
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
@@ -332,7 +349,7 @@ async function runCropAdvisor() {
   };
 
   try {
-    const res = await fetch('/api/crops/recommend', {
+    const res = await fetch(apiUrl('/api/crops/recommend'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -396,7 +413,7 @@ async function sendMsg() {
   msgs.scrollTop = msgs.scrollHeight;
 
   try {
-    const res = await fetch('/api/chat/message', {
+    const res = await fetch(apiUrl('/api/chat/message'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg, history: chatHistory.slice(-10) }),
@@ -438,7 +455,7 @@ function quickMsg(msg) {
 /* ── IRRIGATION ACCEPT ── */
 async function acceptIrrPlan() {
   try {
-    const res = await fetch('/api/irrigation/accept', { method: 'POST' });
+    const res = await fetch(apiUrl('/api/irrigation/accept'), { method: 'POST' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     showToast('✅ Irrigation plan accepted — schedule updated');
     loadDashboard();
@@ -463,7 +480,7 @@ async function saveSettings() {
     mandi:         document.getElementById('s-mandi').checked,
   };
   try {
-    const res = await fetch('/api/settings', {
+    const res = await fetch(apiUrl('/api/settings'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -479,7 +496,7 @@ async function saveSettings() {
 /* ── SETTINGS LOAD ── */
 async function loadSettings() {
   try {
-    const res = await fetch('/api/settings');
+    const res = await fetch(apiUrl('/api/settings'));
     if (!res.ok) return;
     const { settings } = await res.json();
     if (!settings) return;
