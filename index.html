@@ -1,476 +1,512 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agro Mind — Smart Irrigation & Crop Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Agro Mind — Farmer App</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #16a34a; 
+    --bg-color: #f3f4f6; 
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: #1f2937;
+    -webkit-tap-highlight-color: transparent; 
+    padding-bottom: 80px; 
+  }
+  .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid #e5e7eb;
+    display: flex; justify-content: space-around;
+    padding: 10px 5px 25px 5px; z-index: 40;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: #6b7280; font-size: 11px; font-weight: 500; flex: 1; text-align: center;
+  }
+  .nav-item.active { color: var(--primary); font-weight: 700; }
+  .nav-item svg { width: 24px; height: 24px; transition: transform 0.2s; }
+  .nav-item.active svg { transform: scale(1.1); stroke-width: 2.5; }
+  
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
 </head>
-<body>
+<body class="antialiased">
 
-<!-- ═══════════ SIDEBAR ═══════════ -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <div class="brand-icon">🌿</div>
-    <div class="brand-name">Agro Mind</div>
-    <div class="brand-tagline">Smart Crop Intelligence</div>
-  </div>
+<!-- ════════ ONBOARDING SCREEN (First Time Setup) ════════ -->
+<div id="onboarding-screen" class="fixed inset-0 bg-white z-50 flex flex-col justify-center p-6 hidden">
+  <div class="max-w-md mx-auto w-full">
+    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i data-lucide="sprout" class="w-10 h-10 text-green-600"></i>
+    </div>
+    <h1 class="text-3xl font-bold text-center text-gray-900 mb-2">Welcome to AgroMind</h1>
+    <p class="text-center text-gray-500 mb-8">Let's set up your digital farm to get personalized AI advice.</p>
 
-  <div class="nav-group-label">Overview</div>
-  <div class="nav-item active" onclick="nav('dashboard',this)">
-    <span class="nav-icon">📊</span> Dashboard
-  </div>
-  <div class="nav-item" onclick="nav('irrigation',this)">
-    <span class="nav-icon">💧</span> Irrigation
-  </div>
-
-  <div class="nav-group-label">AI Features</div>
-  <div class="nav-item" onclick="nav('disease',this)">
-    <span class="nav-icon">🔬</span> Disease Detection
-  </div>
-  <div class="nav-item" onclick="nav('crops',this)">
-    <span class="nav-icon">🌾</span> Crop Advisor
-  </div>
-  <div class="nav-item" onclick="nav('chat',this)">
-    <span class="nav-icon">🤖</span> Farm AI Chat
-  </div>
-
-  <div class="nav-group-label">System</div>
-  <div class="nav-item" onclick="nav('sensors',this)">
-    <span class="nav-icon">📡</span> Sensors & Data
-    <span class="nav-badge">1</span>
-  </div>
-  <div class="nav-item" onclick="nav('settings',this)">
-    <span class="nav-icon">⚙️</span> Settings
-  </div>
-
-  <div class="sidebar-bottom">
-    <div class="farm-info">
-      <div class="farm-avatar">🧑‍🌾</div>
+    <div class="space-y-4">
       <div>
-        <div class="farm-name">Singh's Farm</div>
-        <div class="farm-loc">Ludhiana, Punjab</div>
+        <label class="block text-sm font-bold text-gray-700 mb-1">Your Name</label>
+        <input type="text" id="setup-name" placeholder="e.g. Singh" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500">
       </div>
-      <div class="status-dot" title="All systems online"></div>
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-1">Farm Name</label>
+        <input type="text" id="setup-farm" placeholder="e.g. Singh's Farm, Punjab" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-1">Primary Crop</label>
+        <select id="setup-crop" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500">
+          <option>Wheat</option><option>Rice / Paddy</option><option>Cotton</option><option>Mustard</option><option>Sugarcane</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-1">App Language</label>
+        <select id="setup-lang" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500">
+          <option value="en">English</option><option value="pa">ਪੰਜਾਬੀ</option><option value="hi">हिंदी</option>
+        </select>
+      </div>
+    </div>
+
+    <button onclick="completeSetup()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-4 rounded-xl mt-8 transition active:scale-95 shadow-lg">
+      Start Farming 🚜
+    </button>
+  </div>
+</div>
+
+<!-- Top Header -->
+<header class="bg-white px-4 py-4 sticky top-0 z-30 shadow-sm flex justify-between items-center">
+  <div class="flex items-center gap-2">
+    <div class="bg-green-100 p-2 rounded-xl text-green-600"><i data-lucide="leaf" class="w-6 h-6"></i></div>
+    <div>
+      <h1 class="font-bold text-lg leading-tight text-gray-900" id="app-title">Agro Mind</h1>
+      <p class="text-xs text-gray-500 font-medium" id="display-farm-name">Loading...</p>
     </div>
   </div>
-</aside>
+  <select id="lang-selector" class="bg-gray-100 border-none text-sm font-semibold rounded-lg px-2 py-2 text-gray-700 outline-none focus:ring-2 focus:ring-green-500" onchange="changeLanguage()">
+    <option value="en">English</option><option value="pa">ਪੰਜਾਬੀ</option><option value="hi">हिंदी</option>
+  </select>
+</header>
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<main class="p-4 max-w-2xl mx-auto">
 
-<!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
-<nav class="bottom-nav" id="bottom-nav">
-  <div class="bottom-nav-inner">
-    <div class="bottom-nav-item active" id="bn-dashboard" onclick="navMobile('dashboard')">
-      <span class="bn-icon">📊</span>
-      <span>Dashboard</span>
+  <!-- ════════ PAGE: HOME ════════ -->
+  <section id="page-home" class="page active">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-800" id="txt-greeting">Sat Sri Akal, Farmer! 👋</h2>
+      <div class="mt-4 bg-gradient-to-r from-blue-500 to-blue-400 rounded-2xl p-4 text-white shadow-md flex justify-between items-center">
+        <div>
+          <p class="text-blue-100 text-sm font-medium" id="txt-weather-title">Today's Weather</p>
+          <p class="text-2xl font-bold mt-1">28°C <span class="text-lg font-normal">Partly Cloudy</span></p>
+          <p class="text-sm mt-1 bg-white/20 inline-block px-2 py-1 rounded-lg">🌧️ 60% chance of rain tomorrow</p>
+        </div>
+        <i data-lucide="sun-dim" class="w-12 h-12 text-yellow-300"></i>
+      </div>
     </div>
-    <div class="bottom-nav-item" id="bn-irrigation" onclick="navMobile('irrigation')">
-      <span class="bn-icon">💧</span>
-      <span>Irrigation</span>
-    </div>
-    <div class="bottom-nav-item" id="bn-disease" onclick="navMobile('disease')">
-      <span class="bn-icon">🔬</span>
-      <span>Disease</span>
-    </div>
-    <div class="bottom-nav-item" id="bn-chat" onclick="navMobile('chat')">
-      <span class="bn-icon">🤖</span>
-      <span>AI Chat</span>
-    </div>
-    <div class="bottom-nav-item" id="bn-more" onclick="openSidebar()">
-      <span class="bn-icon">☰</span>
-      <span>More</span>
-    </div>
-  </div>
-</nav>
 
-<!-- ═══════════ MAIN ═══════════ -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
-      <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
-        <span></span>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <button onclick="nav('scan')" class="bg-white border border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-sm active:bg-gray-50 transition">
+        <div class="bg-green-100 text-green-600 p-3 rounded-full"><i data-lucide="scan-line" class="w-8 h-8"></i></div>
+        <span class="font-semibold text-gray-700" id="txt-btn-scan">Scan Crop</span>
       </button>
-      <div class="topbar-left">
-        <div class="topbar-title" id="topbar-title">Farm Dashboard</div>
-        <div class="topbar-sub">Ludhiana, Punjab · <span id="last-updated">just now</span></div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <div class="chip chip-weather">🌤 28°C · Partly Cloudy</div>
-      <div class="chip chip-alert" onclick="nav('sensors',document.querySelector('.nav-item:nth-child(8)'))">⚠ 2 Alerts</div>
-    </div>
-  </header>
-
-  <!-- ════════ PAGE: DASHBOARD ════════ -->
-  <section class="page active" id="page-dashboard">
-    <div class="page-header">
-      <div>
-        <h2>Farm Overview</h2>
-        <p>Real-time status across all monitored fields — Season: Rabi 2025</p>
-      </div>
-      <button class="btn btn-primary" onclick="showToast('➕ Field creation form will open here')">+ Add Field</button>
+      <button onclick="nav('chat')" class="bg-white border border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-sm active:bg-gray-50 transition">
+        <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-lucide="bot" class="w-8 h-8"></i></div>
+        <span class="font-semibold text-gray-700" id="txt-btn-ask">Ask AI</span>
+      </button>
     </div>
 
-    <!-- Stats -->
-    <div class="grid-4">
-      <div class="stat-card c-green">
-        <div class="stat-icon">💧</div>
-        <div class="stat-label">Water Saved Today</div>
-        <div class="stat-value" id="stat-water">1,840 L</div>
-        <div class="stat-delta pos">↑ 12% vs yesterday</div>
-      </div>
-      <div class="stat-card c-amber">
-        <div class="stat-icon">🌱</div>
-        <div class="stat-label">Avg Soil Moisture</div>
-        <div class="stat-value" id="stat-moisture">68%</div>
-        <div class="stat-delta pos">↑ Optimal range</div>
-      </div>
-      <div class="stat-card c-blue">
-        <div class="stat-icon">🌾</div>
-        <div class="stat-label">Active Fields</div>
-        <div class="stat-value" id="stat-fields">6</div>
-        <div class="stat-delta">4 irrigated today</div>
-      </div>
-      <div class="stat-card c-red">
-        <div class="stat-icon">⚠️</div>
-        <div class="stat-label">Disease Alerts</div>
-        <div class="stat-value" id="stat-disease">2</div>
-        <div class="stat-delta neg">Wheat blight risk</div>
+    <h3 class="font-bold text-gray-800 mb-3 text-lg" id="txt-field-status">Field Status</h3>
+    
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-3 flex items-start gap-3">
+      <div class="bg-red-100 text-red-600 p-2 rounded-full shrink-0"><i data-lucide="droplet" class="w-6 h-6"></i></div>
+      <div class="flex-1">
+        <h4 class="font-bold text-red-800 text-base">Field E is Dry</h4>
+        <p class="text-sm text-red-600 mt-1">Moisture is critically low. Needs water immediately.</p>
+        <button onclick="nav('water')" class="mt-3 bg-red-600 text-white font-bold py-2 px-4 rounded-xl w-full active:bg-red-700 shadow-sm">Water Now</button>
       </div>
     </div>
 
-    <div class="grid-2">
-      <!-- Soil Moisture -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">🌱</span> Soil Moisture by Field</div>
-        <div id="soil-bars"></div>
-      </div>
-      <!-- Alerts -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">🔔</span> Recent Alerts</div>
-        <div id="alerts-list"></div>
-      </div>
-    </div>
-
-    <!-- Water chart -->
-    <div class="card">
-      <div class="card-title"><span class="title-icon">📈</span> Weekly Water Usage (Litres)</div>
-      <div class="bar-chart" id="bar-chart"></div>
+    <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-3 flex items-center gap-3">
+      <div class="bg-green-100 text-green-600 p-2 rounded-full shrink-0"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
+      <div><h4 class="font-bold text-gray-800">Field A</h4><p class="text-sm text-gray-500">Moisture is perfect.</p></div>
     </div>
   </section>
 
-  <!-- ════════ PAGE: IRRIGATION ════════ -->
-  <section class="page" id="page-irrigation">
-    <div class="page-header">
+  <!-- ════════ PAGE: WATER ════════ -->
+  <section id="page-water" class="page">
+    <div class="mb-5">
+      <h2 class="text-2xl font-bold text-gray-800" id="txt-water-title">Irrigation Control</h2>
+      <p class="text-gray-500 text-sm mt-1">Manage water pumps and schedules</p>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-5 flex gap-3 items-start">
+      <i data-lucide="info" class="w-6 h-6 text-blue-600 shrink-0 mt-0.5"></i>
       <div>
-        <h2>Smart Irrigation <span class="tag tag-ai">AI Ready</span></h2>
-        <p>AI-optimised watering schedule based on soil, weather & crop data</p>
+        <h4 class="font-bold text-blue-800">AI Weather Advice</h4>
+        <p class="text-sm text-blue-700 mt-1">Rain is expected tomorrow. Skip watering to save electricity.</p>
       </div>
-      <button class="btn btn-primary" onclick="showToast('▶ Manual run triggered — connecting to pump controller')">▶ Run Now</button>
     </div>
 
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>GET /api/irrigation/schedule</code> · <code>POST /api/irrigation/run</code> · Replace mock data below with API response
-    </div>
-
-    <div class="grid-2">
-      <!-- Schedule -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">📅</span> Today's Schedule</div>
-        <div id="schedule-list"></div>
-      </div>
-
-      <!-- AI Rec -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">🤖</span> AI Recommendation <span class="tag tag-ai" style="margin-left:4px">Backend</span></div>
-        <div class="ai-rec-box" id="irr-ai-box">
-          <strong>Forecast-based suggestion:</strong><br>
-          Rain expected tomorrow (60% probability, ~12mm). Consider <strong>skipping Field D & E</strong> or reducing by 40%. Current soil moisture is adequate for both crops.
-        </div>
-        <div style="font-size:12px;color:var(--text-300);margin-bottom:12px;">
-          Model inputs: soil sensor readings, IMD weather API, crop water-requirement tables
-        </div>
-        <div class="form-grid" style="margin-bottom:12px;">
-          <div class="form-group">
-            <label class="form-label">Weather context</label>
-            <input class="form-control" id="irr-weather" value="28°C, partly cloudy, 60% rain tomorrow">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Override note</label>
-            <input class="form-control" id="irr-note" placeholder="e.g. Pump servicing today">
+    <div class="space-y-3">
+      <div class="bg-white border border-red-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <h4 class="font-bold text-gray-800 text-lg">Field E</h4>
+            <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-bold mt-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Very Dry</span>
           </div>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-primary" style="flex:1" onclick="acceptIrrPlan()">✓ Accept Plan</button>
-          <button class="btn btn-secondary" style="flex:1" onclick="showToast('📝 Plan editor will open here')">Edit Plan</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Parameters form -->
-    <div class="card">
-      <div class="card-title"><span class="title-icon">⚙️</span> Calculate Custom Irrigation</div>
-      <div class="api-banner" style="margin-bottom:14px;">
-        🔌 <strong>Backend hook:</strong> <code>POST /api/irrigation/calculate</code> · Send form data, receive litres + duration
-      </div>
-      <div class="form-grid" style="margin-bottom:14px;">
-        <div class="form-group"><label class="form-label">Crop Type</label><select class="form-control"><option>Wheat</option><option>Rice</option><option>Cotton</option><option>Maize</option><option>Mustard</option></select></div>
-        <div class="form-group"><label class="form-label">Soil Type</label><select class="form-control"><option>Loamy</option><option>Clay</option><option>Sandy</option><option>Silty</option></select></div>
-        <div class="form-group"><label class="form-label">Field Area (Acres)</label><input class="form-control" type="number" value="3.5" step="0.5"></div>
-        <div class="form-group"><label class="form-label">Current Moisture (%)</label><input class="form-control" type="number" value="41" min="0" max="100"></div>
-        <div class="form-group"><label class="form-label">Target Moisture (%)</label><input class="form-control" type="number" value="70" min="0" max="100"></div>
-        <div class="form-group"><label class="form-label">Crop Growth Stage</label><select class="form-control"><option>Germination</option><option>Vegetative</option><option>Flowering</option><option>Grain Fill</option><option>Maturity</option></select></div>
-      </div>
-      <button class="btn btn-primary" onclick="showToast('⚙ Calculating... POST /api/irrigation/calculate')">Calculate Irrigation Plan</button>
-    </div>
-  </section>
-
-  <!-- ════════ PAGE: DISEASE DETECTION ════════ -->
-  <section class="page" id="page-disease">
-    <div class="page-header">
-      <div>
-        <h2>Disease Detection <span class="tag tag-cnn">CNN Model</span></h2>
-        <p>Upload a leaf photo — AI analyses for disease in seconds</p>
-      </div>
-    </div>
-
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>POST /api/disease/analyse</code> · Send image as multipart/form-data · Receive JSON with disease, confidence, treatment
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title"><span class="title-icon">📷</span> Upload Leaf Image</div>
-
-        <!-- Drop zone -->
-        <div class="upload-zone" id="drop-zone"
-          onclick="document.getElementById('file-input').click()"
-          ondragover="event.preventDefault();this.classList.add('drag-over')"
-          ondragleave="this.classList.remove('drag-over')"
-          ondrop="handleDrop(event)">
-          <div class="upload-icon">🍃</div>
-          <div class="upload-text"><strong>Click to upload</strong> or drag & drop<br>JPG, PNG · Max 10 MB</div>
-          <img id="img-preview" src="" alt="preview">
-        </div>
-        <input type="file" id="file-input" accept="image/*" onchange="simulateDisease(event)">
-
-        <!-- Loading -->
-        <div id="disease-loading" style="display:none;text-align:center;padding:20px;color:var(--text-300);font-size:13px;">
-          <div class="skeleton" style="height:14px;width:60%;margin:0 auto 8px;"></div>
-          <div class="skeleton" style="height:10px;width:40%;margin:0 auto;"></div>
-        </div>
-
-        <!-- Result -->
-        <div class="disease-result" id="disease-result">
-          <div class="result-title" id="disease-title"></div>
-          <div class="result-desc"  id="disease-desc"></div>
-          <div class="conf-track"><div class="conf-fill" id="conf-fill"></div></div>
-          <div class="conf-label"  id="conf-label"></div>
-        </div>
-
-        <div style="margin-top:12px;font-size:12px;color:var(--text-300);">
-          ℹ Upload a leaf photo to run AI-powered disease detection via the backend CNN model.
-        </div>
-      </div>
-
-      <!-- History -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">📋</span> Detection History</div>
-        <div id="disease-history"></div>
-        <div style="margin-top:14px;background:var(--blue-100);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--blue-600);border:1px solid #c5d9f0;">
-          <strong>Detectable conditions:</strong> Wheat Blight, Leaf Rust, Powdery Mildew, Brown Spot, Bacterial Streak, Healthy
-        </div>
+        <button onclick="startPump(this)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition">
+          <i data-lucide="power" class="w-5 h-5"></i> Start Pump
+        </button>
       </div>
     </div>
   </section>
 
-  <!-- ════════ PAGE: CROP ADVISOR ════════ -->
-  <section class="page" id="page-crops">
-    <div class="page-header">
-      <div>
-        <h2>Crop Advisor <span class="tag tag-ml">ML Model</span></h2>
-        <p>Enter your field conditions — get the best crop recommendations</p>
+  <!-- ════════ PAGE: SCAN (Updated with Camera & Gallery) ════════ -->
+  <section id="page-scan" class="page">
+    <div class="mb-5 text-center">
+      <h2 class="text-2xl font-bold text-gray-800" id="txt-scan-title">Crop Doctor</h2>
+      <p class="text-gray-500 text-sm mt-1">Check sick leaves to find the cure.</p>
+    </div>
+
+    <!-- NEW: Split Options for Camera and Gallery -->
+    <div id="scan-options" class="grid grid-cols-2 gap-4">
+      <!-- Camera Button -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 text-center cursor-pointer shadow-sm hover:shadow-md transition active:scale-95" onclick="document.getElementById('camera-input').click()">
+        <div class="bg-green-100 text-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="camera" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-bold text-gray-800">Take Photo</h3>
       </div>
-    </div>
-
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>POST /api/crops/recommend</code> · Send field params · Receive ranked crop list with scores
-    </div>
-
-    <div class="card" style="margin-bottom:18px;">
-      <div class="card-title"><span class="title-icon">🌍</span> Field Conditions</div>
-      <div class="form-grid" style="margin-bottom:14px;">
-        <div class="form-group"><label class="form-label">Soil Type</label><select class="form-control" id="c-soil"><option>Loamy</option><option>Clay</option><option>Sandy</option><option>Silty</option><option>Black Cotton Soil</option></select></div>
-        <div class="form-group"><label class="form-label">pH Level</label><input class="form-control" type="number" id="c-ph" value="6.8" min="4" max="9" step="0.1"></div>
-        <div class="form-group"><label class="form-label">Annual Rainfall (mm)</label><input class="form-control" type="number" id="c-rain" value="650" step="50"></div>
-        <div class="form-group"><label class="form-label">Temperature (°C)</label><input class="form-control" type="number" id="c-temp" value="28" step="1"></div>
-        <div class="form-group"><label class="form-label">State / Region</label><select class="form-control" id="c-region"><option>Punjab</option><option>Haryana</option><option>UP</option><option>Rajasthan</option><option>Maharashtra</option><option>MP</option></select></div>
-        <div class="form-group"><label class="form-label">Season</label><select class="form-control" id="c-season"><option>Rabi (Oct–Mar)</option><option>Kharif (Jun–Sep)</option><option>Zaid</option></select></div>
-        <div class="form-group"><label class="form-label">Nitrogen (kg/ha)</label><input class="form-control" type="number" id="c-n" value="80" step="10"></div>
-        <div class="form-group"><label class="form-label">Water Availability</label><select class="form-control" id="c-water"><option>Canal (abundant)</option><option>Borewell (moderate)</option><option>Rain-fed (limited)</option></select></div>
+      
+      <!-- Gallery Button -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 text-center cursor-pointer shadow-sm hover:shadow-md transition active:scale-95" onclick="document.getElementById('gallery-input').click()">
+        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="image" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-bold text-gray-800">Gallery</h3>
       </div>
-      <button class="btn btn-primary" id="crop-btn" onclick="runCropAdvisor()">🔍 Get Recommendations</button>
+
+      <!-- Hidden inputs for specific captures -->
+      <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="processImage(event)">
+      <input type="file" id="gallery-input" accept="image/*" class="hidden" onchange="processImage(event)">
     </div>
 
-    <div class="card" id="crop-results" style="display:none;">
-      <div class="card-title"><span class="title-icon">✅</span> Recommended Crops</div>
-      <div class="crop-grid" id="crop-grid"></div>
-      <div style="margin-top:16px;background:var(--amber-100);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--amber-800);border:1px solid #f0d08a;">
-        <strong>💡 Advisory note:</strong> <span id="crop-summary">Run the advisor above to see an AI-generated crop recommendation summary.</span>
+    <!-- Loading State -->
+    <div id="scan-loading" class="hidden mt-8 text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+      <p class="text-gray-600 font-bold mt-4">AI is analyzing the leaf...</p>
+    </div>
+
+    <!-- Result Card -->
+    <div id="scan-result" class="hidden mt-6 bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-lg">
+      <img id="scanned-image" src="" alt="Scanned Leaf" class="w-full h-48 object-cover">
+      <div class="p-5">
+        <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold tracking-wide uppercase">Disease Found</span>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2 mt-2">Wheat Leaf Blight</h3>
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4 mt-4">
+          <h4 class="font-bold text-green-800 flex items-center gap-2 mb-2"><i data-lucide="pill" class="w-5 h-5"></i> Treatment</h4>
+          <p class="text-sm text-gray-700">Spray Mancozeb 75 WP at 2.5g/L water.</p>
+        </div>
+        <button onclick="resetScan()" class="mt-4 w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl">Scan Another Crop</button>
       </div>
     </div>
   </section>
 
-  <!-- ════════ PAGE: FARM AI CHAT ════════ -->
-  <section class="page" id="page-chat">
-    <div class="page-header">
+  <!-- ════════ PAGE: CHAT ════════ -->
+  <section id="page-chat" class="page">
+    <div class="mb-4 flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+      <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm shrink-0">
+        <i data-lucide="bot" class="w-7 h-7 text-white"></i>
+      </div>
       <div>
-        <h2>Farm AI Chat <span class="tag tag-ai">LLM Ready</span></h2>
-        <p>Conversational assistant for crop advice, disease management & market info</p>
+        <h2 class="text-lg font-bold text-gray-800">Kisan AI</h2>
+        <p class="text-xs text-green-600 font-semibold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p>
       </div>
     </div>
 
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>POST /api/chat/message</code> · Send {message, history} · Receive {reply} · Stream supported
-    </div>
-
-    <div class="chat-wrap">
-      <div class="chat-header">
-        <div class="chat-live-dot"></div>
-        Farm AI Assistant · Expert in Indian Agriculture
-      </div>
-      <div class="chat-messages" id="chat-msgs">
-        <div class="msg-row">
-          <div class="msg-avatar">🌿</div>
-          <div class="msg-bubble">
-            Sat Sri Akal! 🙏 I'm your Farm AI assistant. Ask me anything about crops, irrigation, diseases, fertilisers, market prices, or government schemes.<br><br>
-            <em style="font-size:12px;opacity:0.7">Powered by Gemini / OpenAI. Type a question below to get started.</em>
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col h-[60vh]">
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#efeae2] no-scrollbar">
+        <div class="flex gap-2">
+          <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bot" class="w-4 h-4 text-white"></i></div>
+          <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]">
+            <p class="text-sm text-gray-800" id="chat-welcome-msg">Hello! Ask me about crop prices, fertilizers, or government schemes.</p>
           </div>
         </div>
       </div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-in" placeholder="Ask about crops, irrigation, disease treatment..." onkeydown="if(event.key==='Enter')sendMsg()">
-        <button class="btn btn-primary" id="chat-send-btn" onclick="sendMsg()">Send</button>
+      <div class="px-3 py-2 bg-gray-50 border-t border-gray-200 overflow-x-auto whitespace-nowrap no-scrollbar flex gap-2">
+        <button onclick="sendQuickMessage('What is the current Mandi price for Wheat?')" class="bg-white border border-gray-300 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">💰 Wheat Price</button>
+        <button onclick="sendQuickMessage('How much Urea for 1 acre?')" class="bg-white border border-gray-300 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">🌾 Urea Qty</button>
       </div>
-    </div>
-
-    <!-- Quick chips -->
-    <div class="quick-chips">
-      <div class="quick-chip" onclick="quickMsg('What fertiliser should I use for wheat in December?')">🌾 Wheat fertiliser Dec?</div>
-      <div class="quick-chip" onclick="quickMsg('How do I treat leaf blight in wheat?')">🍃 Treat wheat blight</div>
-      <div class="quick-chip" onclick="quickMsg('What is the MSP for wheat in 2025?')">💰 MSP wheat 2025</div>
-      <div class="quick-chip" onclick="quickMsg('How much water does cotton need per acre?')">💧 Cotton water needs</div>
-      <div class="quick-chip" onclick="quickMsg('Best intercropping for mustard in Punjab?')">🌻 Mustard intercropping</div>
-      <div class="quick-chip" onclick="quickMsg('What are signs of nitrogen deficiency in crops?')">🔬 Nitrogen deficiency</div>
-    </div>
-  </section>
-
-  <!-- ════════ PAGE: SENSORS ════════ -->
-  <section class="page" id="page-sensors">
-    <div class="page-header">
-      <div>
-        <h2>Sensors & Data</h2>
-        <p>Live readings from all field IoT sensors</p>
+      <div class="p-3 bg-white border-t border-gray-200 flex gap-2 items-end">
+        <input type="text" id="chat-input" placeholder="Type here..." class="w-full bg-gray-100 border-none rounded-2xl py-3 pl-4 pr-10 text-sm outline-none focus:ring-2 focus:ring-green-500" onkeydown="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()" class="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition shrink-0 shadow-sm"><i data-lucide="send" class="w-5 h-5 ml-1"></i></button>
       </div>
-      <button class="btn btn-secondary" onclick="showToast('📥 Exporting CSV... GET /api/sensors/export')">📥 Export CSV</button>
-    </div>
-
-    <div class="api-banner">
-      🔌 <strong>Backend hook:</strong> <code>GET /api/sensors/live</code> · Polling every 30s · Replace mock values below with real readings
-    </div>
-
-    <div class="grid-3">
-      <div class="card gauge-card">
-        <div class="card-title" style="justify-content:center;">🌡 Soil Temperature</div>
-        <div class="gauge-num">24<span class="gauge-unit">°C</span></div>
-        <div class="gauge-lbl">Average across all sensors</div>
-        <div class="gauge-track"><div class="gauge-fill" style="width:48%"></div></div>
-      </div>
-      <div class="card gauge-card">
-        <div class="card-title" style="justify-content:center;">💧 Soil Moisture</div>
-        <div class="gauge-num">68<span class="gauge-unit">%</span></div>
-        <div class="gauge-lbl">Field-weighted average</div>
-        <div class="gauge-track"><div class="gauge-fill" style="width:68%"></div></div>
-      </div>
-      <div class="card gauge-card">
-        <div class="card-title" style="justify-content:center;">☀ Light Index</div>
-        <div class="gauge-num">7.2<span class="gauge-unit"> klx</span></div>
-        <div class="gauge-lbl">Solar radiation at canopy</div>
-        <div class="gauge-track"><div class="gauge-fill" style="width:72%"></div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span class="title-icon">📡</span> Sensor Status</div>
-      <div id="sensor-list"></div>
     </div>
   </section>
 
   <!-- ════════ PAGE: SETTINGS ════════ -->
-  <section class="page" id="page-settings">
-    <div class="page-header">
+  <section id="page-settings" class="page">
+    <div class="mb-6"><h2 class="text-2xl font-bold text-gray-800" id="txt-settings-title">Settings</h2></div>
+    
+    <!-- Profile Card -->
+    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-6 flex justify-between items-center">
       <div>
-        <h2>Settings</h2>
-        <p>Configure automation, alerts, and data sources</p>
+        <h3 class="font-bold text-gray-800 text-lg" id="settings-name">Farmer</h3>
+        <p class="text-sm text-gray-500" id="settings-crop">Wheat Farm</p>
       </div>
-      <button class="btn btn-primary" onclick="saveSettings()">💾 Save All</button>
+      <button onclick="resetApp()" class="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-bold">Edit Profile</button>
     </div>
 
-    <div class="grid-2">
-      <!-- Automation -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">🤖</span> Automation</div>
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">Auto Irrigation</div><div class="toggle-sub">AI schedules watering automatically</div></div>
-          <label class="switch"><input type="checkbox" checked id="s-auto-irr"><span class="switch-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">Weather Integration</div><div class="toggle-sub">Fetch IMD / Open-Meteo forecast data</div></div>
-          <label class="switch"><input type="checkbox" checked id="s-weather"><span class="switch-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">Disease Scan Alerts</div><div class="toggle-sub">Notify when disease confidence > 80%</div></div>
-          <label class="switch"><input type="checkbox" checked id="s-disease"><span class="switch-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">SMS Alerts</div><div class="toggle-sub">Push alerts to farmer's mobile number</div></div>
-          <label class="switch"><input type="checkbox" id="s-sms"><span class="switch-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">Market Price Feed</div><div class="toggle-sub">Live mandi prices for crops</div></div>
-          <label class="switch"><input type="checkbox" checked id="s-mandi"><span class="switch-slider"></span></label>
+    <details class="group bg-gray-50 border border-gray-200 rounded-2xl p-4">
+      <summary class="font-bold text-gray-700 cursor-pointer flex justify-between items-center list-none outline-none">
+        API Settings
+        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform"></i>
+      </summary>
+      <div class="mt-4 pt-4 border-t border-gray-200 space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Backend API URL</label>
+          <input type="text" id="api-url-input" value="https://agromind-backend-itu1.onrender.com" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono outline-none">
         </div>
       </div>
-
-      <!-- Farm config -->
-      <div class="card">
-        <div class="card-title"><span class="title-icon">🏡</span> Farm Configuration</div>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">Farm Name</label><input class="form-control" value="Singh's Farm, Ludhiana" id="s-fname"></div>
-          <div class="form-group"><label class="form-label">Total Area (Acres)</label><input class="form-control" type="number" value="18.5" id="s-area"></div>
-          <div class="form-group"><label class="form-label">Primary Water Source</label><select class="form-control" id="s-water"><option>Canal Irrigation</option><option>Borewell</option><option>Rainwater</option></select></div>
-          <div class="form-group"><label class="form-label">Alert Language</label><select class="form-control" id="s-lang"><option>English</option><option>Punjabi</option><option>Hindi</option></select></div>
-          <div class="form-group"><label class="form-label">API Base URL</label><input class="form-control" placeholder="https://your-backend.com/api" id="s-api"></div>
-          <div class="form-group"><label class="form-label">API Key</label><input class="form-control" type="password" placeholder="sk-..." id="s-key"></div>
-        </div>
-      </div>
-    </div>
+    </details>
   </section>
 
-</div><!-- /main -->
+</main>
 
-<!-- TOAST -->
-<div id="toast"></div>
+<nav class="bottom-nav">
+  <button onclick="nav('home')" class="nav-item active" id="nav-home"><i data-lucide="home"></i><span>Home</span></button>
+  <button onclick="nav('water')" class="nav-item" id="nav-water"><i data-lucide="droplets"></i><span>Water</span></button>
+  <button onclick="nav('scan')" class="nav-item" id="nav-scan"><i data-lucide="scan-line"></i><span>Scan</span></button>
+  <button onclick="nav('chat')" class="nav-item" id="nav-chat"><i data-lucide="bot"></i><span>AI Chat</span></button>
+  <button onclick="nav('settings')" class="nav-item" id="nav-settings"><i data-lucide="settings"></i><span>Settings</span></button>
+</nav>
+
+<div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg font-bold text-sm z-50 transition-all duration-300 transform -translate-y-20 opacity-0 flex items-center gap-2 pointer-events-none">
+  <i data-lucide="info" class="w-4 h-4"></i><span id="toast-msg">Notification</span>
+</div>
 
 <script>
-  const DEFAULT_API_BASE = 'https://agromind-backend-itu1.onrender.com';
+  lucide.createIcons();
+
+  /* --- ONBOARDING LOGIC --- */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check if user has completed setup
+    const isSetupComplete = localStorage.getItem('agro_setup_complete');
+    if (!isSetupComplete) {
+      document.getElementById('onboarding-screen').classList.remove('hidden');
+    } else {
+      loadUserData();
+    }
+  });
+
+  function completeSetup() {
+    const name = document.getElementById('setup-name').value || "Farmer";
+    const farm = document.getElementById('setup-farm').value || "My Farm";
+    const crop = document.getElementById('setup-crop').value;
+    const lang = document.getElementById('setup-lang').value;
+
+    localStorage.setItem('agro_setup_complete', 'true');
+    localStorage.setItem('agro_name', name);
+    localStorage.setItem('agro_farm', farm);
+    localStorage.setItem('agro_crop', crop);
+    localStorage.setItem('agro_lang', lang);
+
+    document.getElementById('lang-selector').value = lang;
+    
+    loadUserData();
+    changeLanguage();
+    document.getElementById('onboarding-screen').classList.add('hidden');
+    showToast("Setup Complete! Welcome.");
+  }
+
+  function loadUserData() {
+    const name = localStorage.getItem('agro_name') || "Farmer";
+    const farm = localStorage.getItem('agro_farm') || "My Farm";
+    const lang = localStorage.getItem('agro_lang') || "en";
+    const crop = localStorage.getItem('agro_crop') || "Crops";
+
+    document.getElementById('display-farm-name').innerText = farm;
+    document.getElementById('lang-selector').value = lang;
+    document.getElementById('settings-name').innerText = name;
+    document.getElementById('settings-crop').innerText = "Primary: " + crop;
+    
+    // Update AI welcome message to be personalized
+    document.getElementById('chat-welcome-msg').innerText = `Hello ${name}! How can I help with your ${crop} farm today?`;
+    changeLanguage();
+  }
+
+  function resetApp() {
+    localStorage.removeItem('agro_setup_complete');
+    window.location.reload();
+  }
+
+  /* --- NAVIGATION LOGIC --- */
+  function nav(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('nav-' + pageId).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  /* --- WATER PUMP UI LOGIC --- */
+  function startPump(btn) {
+    btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Starting...';
+    setTimeout(() => {
+      showToast("Pump Started Successfully");
+      btn.className = "w-full bg-red-100 text-red-600 hover:bg-red-200 font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition";
+      btn.innerHTML = '<i data-lucide="square" class="w-5 h-5"></i> Stop Early';
+      btn.onclick = function() { stopPump(btn) };
+      lucide.createIcons();
+    }, 1000);
+  }
+
+  function stopPump(btn) {
+    btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Stopping...';
+    setTimeout(() => {
+      showToast("Pump Stopped manually");
+      btn.className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition";
+      btn.innerHTML = '<i data-lucide="power" class="w-5 h-5"></i> Start Pump';
+      btn.onclick = function() { startPump(btn) };
+      lucide.createIcons();
+    }, 800);
+  }
+
+  /* --- SCAN/DISEASE LOGIC --- */
+  function processImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => { document.getElementById('scanned-image').src = e.target.result; };
+    reader.readAsDataURL(file);
+
+    document.getElementById('scan-loading').classList.remove('hidden');
+    document.getElementById('scan-result').classList.add('hidden');
+    document.getElementById('scan-options').classList.add('hidden');
+
+    setTimeout(() => {
+      document.getElementById('scan-loading').classList.add('hidden');
+      document.getElementById('scan-result').classList.remove('hidden');
+    }, 2000);
+  }
+
+  function resetScan() {
+    document.getElementById('scan-result').classList.add('hidden');
+    document.getElementById('scan-options').classList.remove('hidden');
+  }
+
+  /* --- CHAT UI LOGIC --- */
+  function sendQuickMessage(text) {
+    document.getElementById('chat-input').value = text;
+    sendMessage();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const msgText = input.value.trim();
+    if (!msgText) return;
+    
+    const API_BASE = document.getElementById('api-url-input').value;
+    const chatContainer = document.getElementById('chat-messages');
+    
+    // User Message
+    chatContainer.innerHTML += `
+      <div class="flex gap-2 flex-row-reverse">
+        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="user" class="w-4 h-4 text-gray-600"></i></div>
+        <div class="bg-green-600 text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]"><p class="text-sm">${msgText}</p></div>
+      </div>`;
+    input.value = '';
+    lucide.createIcons();
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // Typing
+    const typingId = 'typing-' + Date.now();
+    chatContainer.innerHTML += `
+      <div id="${typingId}" class="flex gap-2">
+        <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bot" class="w-4 h-4 text-white"></i></div>
+        <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm flex gap-1 items-center">
+          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+        </div>
+      </div>`;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/chat/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msgText, history: [] }),
+      });
+      
+      if (!res.ok) throw new Error("Server error");
+      const data = await res.json();
+      
+      document.getElementById(typingId).remove();
+      chatContainer.innerHTML += `
+        <div class="flex gap-2">
+          <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bot" class="w-4 h-4 text-white"></i></div>
+          <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] border border-green-100">
+            <p class="text-sm text-gray-800">${data.reply}</p>
+          </div>
+        </div>`;
+    } catch (err) {
+      document.getElementById(typingId).remove();
+      // Provide actionable error based on common deployment issues
+      chatContainer.innerHTML += `
+        <div class="flex gap-2">
+          <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bot" class="w-4 h-4 text-white"></i></div>
+          <div class="bg-red-50 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] border border-red-200">
+            <p class="text-sm text-red-800"><b>Connection Error!</b> If you are on Vercel, ensure you added <code>https://agrocloud.vercel.app</code> to the CORS_ORIGIN in your Render backend settings. (Also check if your server is sleeping).</p>
+          </div>
+        </div>`;
+    }
+    lucide.createIcons();
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').innerText = message;
+    toast.classList.remove('translate-y-20', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+    setTimeout(() => {
+      toast.classList.remove('translate-y-0', 'opacity-100');
+      toast.classList.add('translate-y-20', 'opacity-0');
+    }, 3000);
+  }
+
+  const dictionary = {
+    en: { greeting: "Sat Sri Akal, Farmer! 👋", btnScan: "Scan Crop", btnAsk: "Ask AI" },
+    pa: { greeting: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! 👋", btnScan: "ਫਸਲ ਸਕੈਨ", btnAsk: "AI ਨੂੰ ਪੁੱਛੋ" },
+    hi: { greeting: "नमस्ते किसान भाई! 👋", btnScan: "फसल स्कैन", btnAsk: "AI से पूछें" }
+  };
+
+  function changeLanguage() {
+    const lang = document.getElementById('lang-selector').value;
+    const name = localStorage.getItem('agro_name') || "";
+    
+    // Custom logic to include name in greeting
+    if(lang === 'en') document.getElementById('txt-greeting').innerText = `Sat Sri Akal, ${name}! 👋`;
+    if(lang === 'pa') document.getElementById('txt-greeting').innerText = `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ${name}! 👋`;
+    if(lang === 'hi') document.getElementById('txt-greeting').innerText = `नमस्ते ${name}! 👋`;
+    
+    document.getElementById('txt-btn-scan').innerText = dictionary[lang].btnScan;
+    document.getElementById('txt-btn-ask').innerText = dictionary[lang].btnAsk;
+    localStorage.setItem('agro_lang', lang);
+  }
 </script>
-<script src="controller.js"></script>
 </body>
 </html>
