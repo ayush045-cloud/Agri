@@ -10,6 +10,10 @@ if (!API_BASE) {
 
 function apiUrl(path) {
   if (!path || typeof path !== 'string') return API_BASE;
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path) || path.includes('://')) {
+    console.warn('[api] Rejecting absolute URL path input:', path);
+    return API_BASE;
+  }
   return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
