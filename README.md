@@ -70,6 +70,9 @@ npm run dev                   # starts on http://localhost:3001
 | `OPENAI_API_KEY` | OpenAI API key (fallback) |
 | `AI_SERVICE_URL` | Python AI service base URL (default `http://localhost:8000`) |
 | `UPLOAD_DIR` | Directory for uploaded disease images |
+| `CORS_ORIGIN` | Allowed frontend origin (e.g. `https://agrocloud.vercel.app`). Defaults to `*` when unset. |
+
+> **Separate frontend deployment (e.g. Vercel):** Set `CORS_ORIGIN` on the backend host (Railway, Render, …) to the exact origin of your deployed frontend — for example `https://agrocloud.vercel.app`. The backend explicitly handles CORS preflight (`OPTIONS`) requests for all routes, so no proxy or extra configuration is needed on the frontend side.
 
 ---
 

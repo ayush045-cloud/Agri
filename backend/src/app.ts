@@ -21,8 +21,23 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// ── Middleware ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.CORS_ORIGIN ?? '*' }));
+// ── CORS ─────────────────────────────────────────────────────────────────────
+// Origin is read at request time so that the env var can be overridden in tests
+// without requiring a module reload.
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    const allowed = process.env.CORS_ORIGIN ?? '*';
+    callback(null, allowed === '*' ? true : allowed);
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+// Handle preflight OPTIONS requests for every route
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
+
+// ── Body parsers ─────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
