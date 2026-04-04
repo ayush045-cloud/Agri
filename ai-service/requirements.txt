@@ -4,3 +4,5 @@ python-multipart
 pydantic==2.6.1
 pydantic-core==2.16.2
 numpy
+python-dotenv
+Pillow
