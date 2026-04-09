@@ -44,7 +44,6 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Glassmorphism Utilities */
         .glass { 
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(12px); 
@@ -62,7 +61,6 @@
             background: rgba(255, 255, 255, 0.06);
         }
 
-        /* Input Styling */
         input, select { 
             border-color: rgba(255,255,255,0.1) !important; 
             background: rgba(255,255,255,0.05) !important; 
@@ -74,7 +72,6 @@
             outline: none;
         }
 
-        /* Chat Window Styling */
         .chat-container { height: 420px; display: flex; flex-direction: column; }
         @media (max-width: 768px) { .chat-container { height: 350px; } }
         .chat-messages { flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
@@ -82,20 +79,18 @@
         .message-ai { background: rgba(255, 255, 255, 0.05); align-self: flex-start; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(255, 255, 255, 0.1); }
         .message-user { background: #2ecc71; color: #061608; font-weight: 600; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
         
-        /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(46, 204, 113, 0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(46, 204, 113, 0.4); }
 
-        /* Animations */
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="antialiased flex flex-col">
 
-    <!-- SETTINGS MODAL (Hidden by Default) -->
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-brand-dark/90 backdrop-blur-md" onclick="toggleSettings()"></div>
         <div class="max-w-md w-full relative glass rounded-[2.5rem] p-8 shadow-2xl overflow-hidden animate-fade-in">
@@ -112,7 +107,7 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-brand-accent uppercase tracking-widest ml-1">Interface Language</label>
                     <select id="set-lang" class="w-full p-4 rounded-2xl transition-all appearance-none text-sm cursor-pointer">
-                        <option value="en" class="bg-brand-dark">English (Default)</option>
+                        <option value="en" class="bg-brand-dark">English</option>
                         <option value="pa" class="bg-brand-dark">Punjabi (ਪੰਜਾਬੀ)</option>
                         <option value="hi" class="bg-brand-dark">Hindi (हिन्दी)</option>
                     </select>
@@ -123,22 +118,13 @@
                         Save Configuration
                     </button>
                 </div>
-                
-                <div class="mt-4 p-4 bg-black/20 rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Active Node</p>
-                        <p class="text-xs text-brand-accent mt-0.5">agri-psi-beige.vercel.app</p>
-                    </div>
-                    <i data-lucide="server" class="w-4 h-4 text-gray-500"></i>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD WRAPPER -->
+    <!-- MAIN DASHBOARD -->
     <div class="max-w-7xl mx-auto flex flex-col min-h-screen w-full">
         
-        <!-- PREMIUM TOP NAVIGATION -->
         <nav class="p-6 md:p-10 flex justify-between items-center z-40">
             <div class="flex items-center gap-3 md:gap-4">
                 <div class="bg-brand-accent/10 p-2.5 md:p-3 rounded-2xl border border-brand-accent/20">
@@ -151,36 +137,27 @@
                     </h1>
                     <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
                         <span id="sync-dot" class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                        <span id="sync-status">Awaiting Link</span> <span class="mx-1 hidden md:inline">•</span> <span id="display-location" class="hidden md:inline">Neon DB</span>
+                        <span id="sync-status">Awaiting Link</span>
                     </div>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <div class="hidden md:flex bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-bold text-gray-400 items-center gap-2">
-                    <i data-lucide="network" class="w-3 h-3 text-brand-accent"></i>
-                    agri.railway.internal
-                </div>
                 <button onclick="toggleSettings()" class="p-3 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 hover:border-brand-accent/50 transition-all group">
                     <i data-lucide="settings" class="w-5 h-5 text-gray-400 group-hover:text-brand-accent transition-colors"></i>
                 </button>
             </div>
         </nav>
 
-        <!-- MAIN GRID CONTENT -->
         <main class="flex-1 p-6 md:p-10 pt-0">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
                 
-                <!-- LEFT COLUMN: Telemetry & AI -->
                 <div class="lg:col-span-8 space-y-6 md:space-y-8">
                     
-                    <!-- DYNAMIC TELEMETRY HERO -->
                     <div class="relative glass rounded-[2.5rem] p-8 md:p-12 overflow-hidden shadow-2xl">
-                        <!-- Decorative glow -->
                         <div class="absolute -top-20 -left-20 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none"></div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                            <!-- Primary Metric: Moisture -->
                             <div>
                                 <p class="text-brand-accent text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2">
                                     <i data-lucide="radio" class="w-3 h-3 animate-pulse"></i> Live Sensor Stream
@@ -189,17 +166,10 @@
                                     <h2 id="display-moisture" class="text-7xl md:text-8xl font-serif text-white">--%</h2>
                                     <p class="text-gray-400 font-medium">Moisture</p>
                                 </div>
-                                <div class="mt-6 flex flex-wrap items-center gap-3">
-                                    <div class="px-3 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-[9px] font-bold text-brand-accent uppercase tracking-widest">
-                                        PostgreSQL Connected
-                                    </div>
-                                    <span id="sync-time" class="text-xs text-gray-600 font-medium">Syncing...</span>
-                                </div>
                             </div>
                             
-                            <!-- Secondary Metrics -->
                             <div class="flex flex-col justify-center gap-4">
-                                <div class="glass-card p-5 rounded-2xl flex justify-between items-center hover:bg-white/5">
+                                <div class="glass-card p-5 rounded-2xl flex justify-between items-center">
                                     <div>
                                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Temperature</p>
                                         <p id="display-temp" class="text-2xl font-bold text-white mt-1">--°C</p>
@@ -208,7 +178,7 @@
                                         <i data-lucide="thermometer" class="w-6 h-6 text-orange-400"></i>
                                     </div>
                                 </div>
-                                <div class="glass-card p-5 rounded-2xl flex justify-between items-center hover:bg-white/5">
+                                <div class="glass-card p-5 rounded-2xl flex justify-between items-center">
                                     <div>
                                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Humidity</p>
                                         <p id="display-humidity" class="text-2xl font-bold text-white mt-1">--%</p>
@@ -221,25 +191,24 @@
                         </div>
                     </div>
 
-                    <!-- NEURAL AI ASSISTANT -->
                     <div class="space-y-4">
                         <div class="flex justify-between items-center px-2">
                             <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.15em] flex items-center gap-2">
-                                <i data-lucide="cpu" class="w-4 h-4"></i> Gemini 2.5 Farm Intelligence
+                                <i data-lucide="cpu" class="w-4 h-4"></i> Gemini AI Assistant
                             </h3>
-                            <span class="text-[9px] text-brand-accent font-bold animate-pulse uppercase tracking-widest bg-brand-accent/10 px-2 py-1 rounded">API Active</span>
+                            <span class="text-[9px] text-brand-accent font-bold uppercase tracking-widest bg-brand-accent/10 px-2 py-1 rounded">Secure Core</span>
                         </div>
                         
                         <div class="glass rounded-[2rem] overflow-hidden chat-container shadow-2xl">
                             <div id="chat-messages" class="chat-messages">
                                 <div class="message message-ai">
-                                    System initialized. I am monitoring your Neon DB telemetry stream in real-time. How can I assist with your crop optimization today?
+                                    System initialized. I am monitoring your farm telemetry in real-time. How can I assist with your crops today?
                                 </div>
                             </div>
                             <div class="p-4 border-t border-white/5 bg-black/20 backdrop-blur-xl">
                                 <div class="relative flex gap-2 items-center">
-                                    <input type="text" id="chat-input" placeholder="Type your farming query here..." class="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-white transition-colors focus:border-brand-accent text-sm placeholder:text-gray-600">
-                                    <button onclick="sendMessage()" id="send-btn" class="bg-brand-accent hover:bg-green-400 text-brand-dark h-12 w-14 rounded-2xl font-bold flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-brand-accent/20 shrink-0">
+                                    <input type="text" id="chat-input" placeholder="Ask about your crops..." class="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-white transition-colors focus:border-brand-accent text-sm">
+                                    <button onclick="sendMessage()" id="send-btn" class="bg-brand-accent hover:bg-green-400 text-brand-dark h-12 w-14 rounded-2xl font-bold flex items-center justify-center transition-all shadow-lg shrink-0">
                                         <i data-lucide="send" class="w-5 h-5"></i>
                                     </button>
                                 </div>
@@ -248,45 +217,31 @@
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: Actions & Market -->
                 <div class="lg:col-span-4 space-y-6 md:space-y-8">
-                    
-                    <!-- IRRIGATION ENGINE -->
                     <div class="glass-card rounded-[2.5rem] p-6 md:p-8 border-t border-l border-white/10 relative overflow-hidden">
-                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-red-500/5 rounded-full blur-3xl"></div>
-                        
-                        <div class="flex items-center gap-4 mb-8 relative z-10">
-                            <div class="bg-red-500/10 p-4 rounded-2xl text-red-500 border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="bg-red-500/10 p-4 rounded-2xl text-red-500 border border-red-500/20">
                                 <i data-lucide="power" class="w-6 h-6"></i>
                             </div>
                             <div>
                                 <h4 class="text-white font-bold text-lg">Irrigation Engine</h4>
-                                <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Manual API Override</p>
+                                <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Manual Control</p>
                             </div>
                         </div>
                         
-                        <button id="pump-btn" onclick="triggerIrrigation()" class="w-full bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest py-5 rounded-2xl shadow-xl shadow-red-500/20 active:scale-95 transition-all relative z-10 flex items-center justify-center gap-2">
-                            <i data-lucide="droplet" class="w-4 h-4"></i> Execute Pump Command
+                        <button id="pump-btn" onclick="triggerIrrigation()" class="w-full bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="droplet" class="w-4 h-4"></i> Run Pump
                         </button>
                         
-                        <div class="mt-5 p-4 bg-black/20 rounded-xl border border-white/5 relative z-10">
-                            <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
-                                <i data-lucide="clock" class="w-3 h-3"></i> Last Sequence
-                            </p>
+                        <div class="mt-5 p-4 bg-black/20 rounded-xl border border-white/5">
+                            <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Last Activity</p>
                             <p class="text-xs text-white font-medium" id="last-run">No recent runs recorded</p>
                         </div>
                     </div>
 
-                    <!-- MARKET PULSE -->
                     <div class="bg-brand-muted rounded-[2.5rem] p-6 md:p-8 border border-white/5 overflow-hidden relative shadow-2xl">
-                        <!-- Abstract chart background -->
-                        <div class="absolute -right-6 -bottom-6 opacity-[0.03] text-white">
-                            <i data-lucide="bar-chart-3" class="w-48 h-48"></i>
-                        </div>
-                        
-                        <h4 class="text-brand-accent text-[10px] font-black uppercase tracking-widest mb-6 relative z-10">Regional Market Pulse</h4>
-                        
-                        <div class="space-y-5 relative z-10">
+                        <h4 class="text-brand-accent text-[10px] font-black uppercase tracking-widest mb-6">Market Pulse</h4>
+                        <div class="space-y-5">
                             <div class="flex justify-between items-end">
                                 <div>
                                     <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Wheat Index</p>
@@ -294,56 +249,35 @@
                                 </div>
                                 <div class="bg-brand-accent/10 px-2 py-1 rounded border border-brand-accent/20 flex items-center gap-1">
                                     <i data-lucide="trending-up" class="w-3 h-3 text-brand-accent"></i>
-                                    <span class="text-[10px] font-black text-brand-accent tracking-wider">+0%</span>
+                                    <span class="text-[10px] font-black text-brand-accent">+0%</span>
                                 </div>
-                            </div>
-                            
-                            <div class="flex items-center gap-2 p-3 bg-black/20 rounded-xl border border-white/5">
-                                <i data-lucide="activity" class="w-4 h-4 text-brand-accent shrink-0"></i>
-                                <span class="text-[11px] text-gray-400 font-medium leading-tight">Waiting for pricing oracle sync...</span>
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </main>
 
-        <!-- GLOBAL TOAST NOTIFICATION -->
-        <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass border-brand-accent/20 px-6 py-4 rounded-2xl text-brand-accent font-bold text-sm opacity-0 translate-y-4 transition-all duration-300 z-[200] pointer-events-none flex items-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+        <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass border-brand-accent/20 px-6 py-4 rounded-2xl text-brand-accent font-bold text-sm opacity-0 translate-y-4 transition-all duration-300 z-[200] pointer-events-none flex items-center gap-3 shadow-2xl">
             <i id="toast-icon-success" data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent hidden"></i>
             <i id="toast-icon-error" data-lucide="alert-triangle" class="w-5 h-5 text-red-500 hidden"></i>
-            <span id="toast-msg" class="whitespace-nowrap">Notification</span>
+            <span id="toast-msg">Notification</span>
         </div>
     </div>
 
-    <!-- ─── CORE APPLICATION LOGIC ─── -->
     <script>
-        // Initialize Icons
         lucide.createIcons();
 
-        // Environment Variables & Constants
         const API_BASE = "https://agri-psi-beige.vercel.app".replace(/\/$/, "");
-        const GEMINI_KEY = "AIzaSyB88FNsXuQK7gPi3ceJRDmwLenBs_q5Ycw";
-        const AI_SERVICE_URL = "agri.railway.internal";
-        const DB_ID = "neondb_owner";
-        
-        let syncInterval = null;
+        const GEMINI_KEY = ""; // Key is injected at runtime in this environment
 
-        // ─── UI CONTROLS ───
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
             if (modal.classList.contains('hidden')) {
-                // Open
                 modal.classList.remove('hidden');
-                // Allow a tiny delay for display:block to apply before animating opacity
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
-                
-                // Pre-fill existing data
-                const name = localStorage.getItem('agro_name') || "";
-                document.getElementById('set-name').value = name;
+                document.getElementById('set-name').value = localStorage.getItem('agro_name') || "";
             } else {
-                // Close
                 modal.classList.add('opacity-0');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
@@ -355,164 +289,88 @@
             const iconSuccess = document.getElementById('toast-icon-success');
             const iconError = document.getElementById('toast-icon-error');
             
-            // Reset state
-            toast.className = "fixed bottom-10 left-1/2 -translate-x-1/2 glass px-6 py-4 rounded-2xl font-bold text-sm opacity-0 translate-y-4 transition-all duration-300 z-[200] pointer-events-none flex items-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)]";
             iconSuccess.classList.add('hidden');
             iconError.classList.add('hidden');
             
-            // Apply Type Styles
             if (type === "error") {
-                toast.classList.add('border-red-500/30', 'text-red-400');
+                toast.style.borderColor = "rgba(239, 68, 68, 0.3)";
+                msgEl.style.color = "#f87171";
                 iconError.classList.remove('hidden');
-            } else if (type === "success") {
-                toast.classList.add('border-brand-accent/30', 'text-brand-accent');
-                iconSuccess.classList.remove('hidden');
             } else {
-                toast.classList.add('border-white/10', 'text-white');
+                toast.style.borderColor = "rgba(46, 204, 113, 0.3)";
+                msgEl.style.color = "#2ecc71";
+                iconSuccess.classList.remove('hidden');
             }
 
             msgEl.textContent = msg;
-            
-            // Animate In
             toast.classList.remove('opacity-0', 'translate-y-4');
             toast.classList.add('opacity-100', 'translate-y-0');
             
-            // Auto Hide
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-4');
                 toast.classList.remove('opacity-100', 'translate-y-0');
-            }, 3500);
+            }, 3000);
         }
 
         function saveSettings() {
-            const nameInput = document.getElementById('set-name');
-            const name = nameInput.value.trim();
-
-            // BUG FIX: Entry Field Validation
+            const name = document.getElementById('set-name').value.trim();
             if (!name) {
-                showToast("Name field cannot be empty. Please enter your name.", "error");
-                nameInput.focus();
+                showToast("Name is required", "error");
                 return;
             }
-
             localStorage.setItem('agro_name', name);
-            showToast("System profile updated successfully.", "success");
+            showToast("Settings saved", "success");
             toggleSettings();
-            
-            // Personalize greeting in chat if they just set it
-            appendMessage(`Profile recognized. Welcome, ${name}.`, 'ai');
-        }
-
-        // ─── API & TELEMETRY ENGINE ───
-        async function apiRequest(endpoint, method = 'GET', body = null) {
-            try {
-                const options = {
-                    method,
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
-                };
-                if (body) options.body = JSON.stringify(body);
-                
-                const response = await fetch(`${API_BASE}${endpoint}`, options);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                return await response.json();
-            } catch (err) {
-                console.warn("API Sync Interrupted:", err);
-                return null;
-            }
-        }
-
-        function setSyncStatus(active, message) {
-            const dot = document.getElementById('sync-dot');
-            const label = document.getElementById('sync-status');
-            
-            if (active) {
-                dot.className = "w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse";
-                label.className = "text-brand-accent";
-            } else {
-                dot.className = "w-1.5 h-1.5 rounded-full bg-orange-500";
-                label.className = "text-orange-400";
-            }
-            label.textContent = message;
+            appendMessage(`Welcome, ${name}. I am ready to help.`, 'ai');
         }
 
         async function syncTelemetry() {
-            const data = await apiRequest('/api/sensors/latest');
-            
-            // Destructure elements
-            const elMoisture = document.getElementById('display-moisture');
-            const elTemp = document.getElementById('display-temp');
-            const elHumidity = document.getElementById('display-humidity');
-            const elTime = document.getElementById('sync-time');
-            const elMarket = document.getElementById('market-price');
-
-            if (data) {
-                // Handle array or single object response
+            try {
+                const response = await fetch(`${API_BASE}/api/sensors/latest`);
+                const data = await response.json();
                 const latest = Array.isArray(data) ? data[0] : data;
-                
+
                 if (latest) {
-                    elMoisture.textContent = `${latest.moisture ?? latest.soilMoisture ?? '--'}%`;
-                    elTemp.textContent = `${latest.temperature ?? '--'}°C`;
-                    elHumidity.textContent = `${latest.humidity ?? '--'}%`;
-                    elTime.textContent = `Last Pull: ${new Date().toLocaleTimeString()}`;
+                    document.getElementById('display-moisture').textContent = `${latest.moisture ?? latest.soilMoisture ?? '--'}%`;
+                    document.getElementById('display-temp').textContent = `${latest.temperature ?? '--'}°C`;
+                    document.getElementById('display-humidity').textContent = `${latest.humidity ?? '--'}%`;
+                    document.getElementById('market-price').textContent = "2,185";
                     
-                    // Simulate market data arrival alongside sensor data
-                    if (elMarket.textContent === "--") elMarket.textContent = "2,185";
-                    
-                    setSyncStatus(true, 'SYSTEM SYNCHRONIZED');
-                } else {
-                    elTime.textContent = "DB connected, waiting for stream.";
-                    setSyncStatus(true, 'AWAITING DATA');
+                    const dot = document.getElementById('sync-dot');
+                    dot.className = "w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse";
+                    document.getElementById('sync-status').textContent = "SYSTEM ACTIVE";
                 }
-            } else {
-                // Graceful degradation: keep existing values, just update status
-                elTime.textContent = "Unable to reach Vercel endpoint.";
-                setSyncStatus(false, 'LOCAL MODE');
+            } catch (err) {
+                document.getElementById('sync-status').textContent = "OFFLINE MODE";
+                document.getElementById('sync-dot').className = "w-1.5 h-1.5 rounded-full bg-orange-500";
             }
         }
 
         async function triggerIrrigation() {
             const btn = document.getElementById('pump-btn');
-            const originalHTML = btn.innerHTML;
-            
             btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> TRANSMITTING...`;
-            lucide.createIcons();
+            btn.textContent = "TRANSMITTING...";
             
-            const res = await apiRequest('/api/irrigation/run', 'POST', { 
-                triggeredBy: "AgroMind Premium Dash",
-                timestamp: new Date().toISOString()
-            });
+            try {
+                const res = await fetch(`${API_BASE}/api/irrigation/run`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timestamp: new Date().toISOString() })
+                });
 
-            if (res) {
-                showToast("Irrigation command dispatched to field controller.", "success");
-                btn.classList.replace('bg-red-500', 'bg-blue-600');
-                btn.classList.replace('hover:bg-red-600', 'hover:bg-blue-500');
-                btn.classList.replace('shadow-red-500/20', 'shadow-blue-500/20');
-                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> SEQUENCE ACTIVE`;
-                document.getElementById('last-run').textContent = `Running since ${new Date().toLocaleTimeString()}`;
-                
-                // Reset styling after 5s
-                setTimeout(() => {
-                    btn.classList.replace('bg-blue-600', 'bg-red-500');
-                    btn.classList.replace('hover:bg-blue-500', 'hover:bg-red-600');
-                    btn.classList.replace('shadow-blue-500/20', 'shadow-red-500/20');
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    lucide.createIcons();
-                }, 5000);
-            } else {
-                showToast("Connection Error: Backend unreachable.", "error");
-                btn.innerHTML = originalHTML;
+                if (res.ok) {
+                    showToast("Pump started successfully", "success");
+                    document.getElementById('last-run').textContent = `Last run: ${new Date().toLocaleTimeString()}`;
+                }
+            } catch (err) {
+                showToast("Network failure", "error");
+            } finally {
                 btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="droplet" class="w-4 h-4"></i> Run Pump`;
                 lucide.createIcons();
             }
         }
 
-        // ─── NEURAL AI (GEMINI) ENGINE ───
         function appendMessage(text, role) {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
@@ -524,88 +382,44 @@
 
         async function sendMessage() {
             const input = document.getElementById('chat-input');
-            const btn = document.getElementById('send-btn');
             const text = input.value.trim();
+            if (!text) return;
 
-            // BUG FIX: Strict Entry Validation
-            if (!text) {
-                showToast("Query empty. Please type a message to the AI.", "error");
-                input.focus();
-                return;
-            }
-
-            // Lock UI and send message
             appendMessage(text, 'user');
             input.value = "";
+            const btn = document.getElementById('send-btn');
             btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 text-brand-dark animate-spin"></i>`;
-            lucide.createIcons();
 
             try {
-                // Fetch real-time context from DOM
                 const moisture = document.getElementById('display-moisture').textContent;
-                const temp = document.getElementById('display-temp').textContent;
-                const humidity = document.getElementById('display-humidity').textContent;
-                
-                const context = `
-                    Farmer DB ID: ${DB_ID}
-                    Real-time Telemetry: Moisture ${moisture}, Temp ${temp}, Humidity ${humidity}.
-                    Infrastructure: AI Service via ${AI_SERVICE_URL}.
-                `;
-                
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: `System Context: ${context}. User Query: ${text}` }] }],
-                        systemInstruction: { parts: [{ text: "You are the Agro Mind AI. You are a highly professional, concise, and scientific agricultural assistant. ALWAYS use the provided telemetry data in your answers if relevant. Do not use markdown." }] }
+                        contents: [{ parts: [{ text: `Current soil moisture is ${moisture}. Farmer asks: ${text}` }] }],
+                        systemInstruction: { parts: [{ text: "You are the Agro Mind AI. Give short, professional farming advice. Do not use markdown." }] }
                     })
                 });
 
                 const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
-
-                const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Processing failure in neural node.";
-                appendMessage(aiResponse, 'ai');
+                const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "AI offline.";
+                appendMessage(aiText, 'ai');
             } catch (err) {
-                console.error(err);
-                appendMessage("Connection to Gemini Intelligence Node timed out or failed. Please check network.", 'ai');
-                showToast("AI Processing Error", "error");
+                appendMessage("AI connection error.", 'ai');
             } finally {
-                // Unlock UI
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="send" class="w-5 h-5"></i>`;
-                lucide.createIcons();
-                document.getElementById('chat-input').focus();
             }
         }
 
-        // ─── BOOTSTRAP PROCESS ───
         window.onload = () => {
-            // Initial Data Pull
             syncTelemetry();
-            
-            // Establish Polling Loop (15 seconds)
-            syncInterval = setInterval(syncTelemetry, 15000);
-            
-            // Check if profile exists, greet user in chat if so
+            setInterval(syncTelemetry, 15000);
             const name = localStorage.getItem('agro_name');
-            if (name) {
-                setTimeout(() => {
-                    appendMessage(`Welcome back, ${name}. Telemetry streams are standing by.`, 'ai');
-                }, 1000);
-            }
+            if (name) setTimeout(() => appendMessage(`Hello ${name}, system is ready.`, 'ai'), 800);
         };
 
-        // Enter key listener for chat
         document.getElementById('chat-input').addEventListener('keypress', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
+            if (e.key === 'Enter') sendMessage();
         });
     </script>
 </body>
