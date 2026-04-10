@@ -588,7 +588,126 @@
 
 <div id="toast"></div>
 
-<!-- FIREBASE CLOUD SESSION SYSTEM -->
+
+<script>
+// ==========================================
+// 1. ROBUST LOCAL PERSISTENCE (IndexedDB)
+// ==========================================
+// This ensures that if you are running this locally without Firebase,
+// it never asks for your login again.
+const LocalDB = {
+  open() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('AgroMindDB', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('store');
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror = e => reject(e);
+    });
+  },
+  async get(key) {
+    try {
+      const db = await this.open();
+      return new Promise(resolve => {
+        const req = db.transaction('store').objectStore('store').get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    } catch(e) { return null; }
+  },
+  async set(key, val) {
+    try {
+      const db = await this.open();
+      return new Promise(resolve => {
+        const req = db.transaction('store', 'readwrite').objectStore('store').put(val, key);
+        req.onsuccess = () => resolve();
+        req.onerror = () => resolve();
+      });
+    } catch(e) {}
+  }
+};
+
+// Global variables
+var API = 'http://127.0.0.1:5000';
+var farmerData = {};
+var currentEditField = '';
+var diseaseAlerts = [];
+var lastDiseaseResult = null;
+var chatHistory = [];
+var chatTyping = false;
+var lastIrrData = {};
+
+// Fallback persistence methods (can be overridden by Firebase)
+window.saveSession = async function() {
+  const safeAlerts = diseaseAlerts.map(a => ({
+    ...a,
+    addedAt: a.addedAt ? (a.addedAt instanceof Date ? a.addedAt.toISOString() : a.addedAt) : null,
+    followupAt: a.followupAt ? (a.followupAt instanceof Date ? a.followupAt.toISOString() : a.followupAt) : null
+  }));
+  await LocalDB.set('agromind_session', { farmerData, diseaseAlerts: safeAlerts, lastIrrData });
+};
+
+window.clearSession = async function() {
+  await LocalDB.set('agromind_session', null);
+};
+
+window.loadLocalSession = async function() {
+  const data = await LocalDB.get('agromind_session');
+  if (data && data.farmerData && data.farmerData.name) {
+    farmerData = data.farmerData;
+    diseaseAlerts = (data.diseaseAlerts || []).map(a => ({
+      ...a,
+      addedAt: a.addedAt ? new Date(a.addedAt) : null,
+      followupAt: a.followupAt ? new Date(a.followupAt) : null
+    }));
+    lastIrrData = data.lastIrrData || {};
+    return true;
+  }
+  return false;
+};
+
+// Expose UI control globally
+window.showLogin = function() {
+  document.getElementById('app-loading').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+};
+
+window.initApp = function() {
+  document.getElementById('sb-name').textContent = farmerData.name;
+  var acresTxt = farmerData.acres ? ' - ' + farmerData.acres + ' acres' : '';
+  document.getElementById('sb-sub').textContent = farmerData.village + ' - ' + farmerData.numfields + ' fields' + acresTxt;
+  refreshSettingsDisplay();
+  
+  document.getElementById('app-loading').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  
+  loadDashboard();
+  loadWeather();
+
+  // Welcome-back toast
+  if (window._restoredFromCookie) {
+    window._restoredFromCookie = false;
+    showToast('👋 Welcome back, ' + farmerData.name + '!');
+  }
+
+  if (farmerLat !== null && farmerLon !== null) {
+    if (gmapsLoaded) {
+      initDashboardMap(farmerLat, farmerLon);
+    } else {
+      var tries = 0;
+      var wait = setInterval(function() {
+        tries++;
+        if (gmapsLoaded) { clearInterval(wait); initDashboardMap(farmerLat, farmerLon); }
+        if (tries > 30) clearInterval(wait);
+      }, 200);
+    }
+  }
+};
+</script>
+
+<!-- ==========================================
+// 2. CLOUD PERSISTENCE (Firebase)
+// ========================================== -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -601,19 +720,25 @@
   window.firebaseUser = null;
 
   async function bootApp() {
+    // If not in a connected environment, load robust local DB
     if (!firebaseConfig) {
-      // Fallback if running purely local HTML file outside platform.
-      console.warn("Cloud persistence is unavailable locally. Data won't save on reload.");
-      showLogin();
+      console.log("Using seamless Local IndexedDB Persistence");
+      const hasLocal = await window.loadLocalSession();
+      if (hasLocal) {
+        window._restoredFromCookie = true;
+        window.initApp();
+      } else {
+        window.showLogin();
+      }
       return;
     }
 
+    // Otherwise, wire up Firebase for perfect cloud syncing
     try {
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       window.firebaseDb = getFirestore(app);
 
-      // RULE 3: Auth Before Queries
       const initAuth = async () => {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
@@ -628,18 +753,17 @@
           window.firebaseUser = user;
           await loadSessionFromCloud();
         } else {
-          showLogin();
+          window.showLogin();
         }
       });
     } catch (e) {
       console.error("Firebase init failed:", e);
-      showLogin();
+      window.showLogin();
     }
   }
 
   async function loadSessionFromCloud() {
     try {
-      // RULE 1: Strict Paths
       const docRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
       const snap = await getDoc(docRef);
       if (snap.exists()) {
@@ -655,7 +779,7 @@
           }
           if (data.lastIrrData) window.lastIrrData = data.lastIrrData;
 
-          // Pre-fill fields just in case they log out and want to edit
+          // Pre-fill forms just in case
           const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
           setVal('l-name',       window.farmerData.name);
           setVal('l-village',    window.farmerData.village);
@@ -667,70 +791,50 @@
           setVal('l-notes',      window.farmerData.notes);
 
           window._restoredFromCookie = true; 
-          document.getElementById('app-loading').style.display = 'none';
           window.initApp();
+          
+          // Override global saves to push to Cloud
+          window.saveSession = async function() {
+            const safeAlerts = window.diseaseAlerts.map(a => ({
+              ...a, addedAt: a.addedAt ? (a.addedAt instanceof Date ? a.addedAt.toISOString() : a.addedAt) : null,
+              followupAt: a.followupAt ? (a.followupAt instanceof Date ? a.followupAt.toISOString() : a.followupAt) : null
+            }));
+            await setDoc(docRef, { farmerData: window.farmerData, diseaseAlerts: safeAlerts, lastIrrData: window.lastIrrData });
+          };
+
+          window.clearSession = async function() {
+            await setDoc(docRef, {});
+          };
           return;
         }
       }
-      showLogin();
+      window.showLogin();
+      
+      // Override global saves for newly created cloud users
+      const newDocRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
+      window.saveSession = async function() {
+        const safeAlerts = window.diseaseAlerts.map(a => ({
+          ...a, addedAt: a.addedAt ? (a.addedAt instanceof Date ? a.addedAt.toISOString() : a.addedAt) : null,
+          followupAt: a.followupAt ? (a.followupAt instanceof Date ? a.followupAt.toISOString() : a.followupAt) : null
+        }));
+        await setDoc(newDocRef, { farmerData: window.farmerData, diseaseAlerts: safeAlerts, lastIrrData: window.lastIrrData });
+      };
+      
     } catch (e) {
       console.error("Load session error", e);
-      showLogin();
+      window.showLogin();
     }
   }
-
-  function showLogin() {
-    document.getElementById('app-loading').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-  }
-
-  // Global save method that writes to Firestore seamlessly
-  window.saveSession = async function() {
-    if (!window.firebaseDb || !window.firebaseUser) return;
-    try {
-      const docRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
-      const safeAlerts = window.diseaseAlerts.map(a => ({
-        ...a,
-        addedAt: a.addedAt ? (a.addedAt instanceof Date ? a.addedAt.toISOString() : a.addedAt) : null,
-        followupAt: a.followupAt ? (a.followupAt instanceof Date ? a.followupAt.toISOString() : a.followupAt) : null
-      }));
-      await setDoc(docRef, {
-        farmerData: window.farmerData,
-        diseaseAlerts: safeAlerts,
-        lastIrrData: window.lastIrrData
-      });
-    } catch (e) {
-      console.error("Save session error", e);
-    }
-  };
-
-  // Global clear method for logout
-  window.clearSession = async function() {
-    if (!window.firebaseDb || !window.firebaseUser) return;
-    try {
-      const docRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
-      await setDoc(docRef, {});
-    } catch (e) {}
-  };
 
   bootApp();
 </script>
 
 <script>
-// Prevent TypeError if synchronous code triggers saveSession before module loads
-window.saveSession = window.saveSession || async function() {};
-window.clearSession = window.clearSession || async function() {};
+// ==========================================
+// Core Application Logic
+// ==========================================
 
-var API = 'http://127.0.0.1:5000';
-var farmerData = {};
-var currentEditField = '';
-var diseaseAlerts = [];
-var lastDiseaseResult = null;
-var chatHistory = [];
-var chatTyping = false;
-var lastIrrData = {};
-
-function doLogin() {
+async function doLogin() {
   var name = document.getElementById('l-name').value.trim();
   var village = document.getElementById('l-village').value.trim();
   var numfields = document.getElementById('l-numfields').value.trim();
@@ -755,51 +859,32 @@ function doLogin() {
     water: document.getElementById('l-water').value.trim(),
     notes: document.getElementById('l-notes').value.trim()
   };
-  saveSession(); // 💾 persist farmer profile to Firebase
-  initApp();
+  
+  // Show saving state to prevent race conditions before init
+  const btn = document.querySelector('.login-btn');
+  const oldText = btn.innerHTML;
+  btn.innerHTML = '⏳ Saving...';
+  btn.disabled = true;
+
+  await window.saveSession(); // Await full persistence
+  
+  btn.innerHTML = oldText;
+  btn.disabled = false;
+  
+  window.initApp();
 }
 
-function initApp() {
-  document.getElementById('sb-name').textContent = farmerData.name;
-  var acresTxt = farmerData.acres ? ' - ' + farmerData.acres + ' acres' : '';
-  document.getElementById('sb-sub').textContent = farmerData.village + ' - ' + farmerData.numfields + ' fields' + acresTxt;
-  refreshSettingsDisplay();
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-  loadDashboard();
-  loadWeather();
-
-  // Welcome-back toast if restored from cloud
-  if (window._restoredFromCookie) {
-    window._restoredFromCookie = false;
-    showToast('👋 Welcome back, ' + farmerData.name + '!');
-  }
-
-  // Show farm map on dashboard using coords from login (if captured)
-  if (farmerLat !== null && farmerLon !== null) {
-    if (gmapsLoaded) {
-      initDashboardMap(farmerLat, farmerLon);
-    } else {
-      var tries = 0;
-      var wait = setInterval(function() {
-        tries++;
-        if (gmapsLoaded) { clearInterval(wait); initDashboardMap(farmerLat, farmerLon); }
-        if (tries > 30) clearInterval(wait);
-      }, 200);
-    }
-  }
-}
-
-function doLogout() {
-  clearSession(); // 🗑️ wipe cloud session
+async function doLogout() {
+  await window.clearSession(); // Wipe session (local or cloud)
   farmerData = {}; lastIrrData = {};
-  document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').classList.remove('visible');
   diseaseAlerts = []; lastDiseaseResult = null; chatHistory = [];
   document.getElementById('disease-result').className = 'disease-result';
   document.getElementById('img-preview').style.display = 'none';
   document.getElementById('add-alert-btn').classList.remove('show');
   document.getElementById('crop-results').style.display = 'none';
+  
+  window.showLogin();
   nav('dashboard');
 }
 
@@ -855,11 +940,9 @@ var OWM_KEY = '9969dce35cb019a2cc04d1bdac769423';
 var farmerLat = null, farmerLon = null;
 
 function loadWeather() {
-  // Try GPS coords first (set during detectLocation), fall back to village name geocoding
   if (farmerLat !== null && farmerLon !== null) {
     fetchWeatherByCoords(farmerLat, farmerLon);
   } else {
-    // Geocode village name via OWM geo API
     var village = encodeURIComponent(farmerData.village || 'Amritsar,IN');
     fetch('https://api.openweathermap.org/geo/1.0/direct?q=' + village + '&limit=1&appid=' + OWM_KEY)
       .then(function(r) { return r.json(); })
@@ -882,10 +965,8 @@ function fetchWeatherByCoords(lat, lon) {
       var desc  = d.weather[0].main;
       var icon  = owmIcon(d.weather[0].id);
 
-      // Topbar chip
       document.getElementById('weather-chip').textContent = icon + ' ' + temp + '  ' + desc;
 
-      // Dashboard weather strip
       var strip = document.getElementById('wx-strip');
       if (strip) {
         document.getElementById('wx-icon').textContent  = icon;
@@ -939,7 +1020,7 @@ function submitLastIrrigation() {
     lastIrrData[name] = { date: dateVal }; // save per-field date
     return { field: name, last_watered: dateVal || null };
   });
-  saveSession(); // 💾 persist irrigation dates
+  window.saveSession(); // background save
   document.getElementById('last-irr-section').style.display = 'none';
   document.getElementById('irr-result-section').style.display = 'block';
   fetch(API + '/api/irrigation/schedule', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({entries:entries,farmer:farmerData}) })
@@ -1066,7 +1147,7 @@ function addDiseaseAlert() {
   var fn=prompt('Which field has this problem?'); if (fn===null) return;
   diseaseAlerts.push({id:Date.now(),fieldName:fn.trim()||'Unknown Field',diseaseName:lastDiseaseResult.title,treatment:lastDiseaseResult.treatment,addedAt:new Date(),followupAt:new Date(Date.now()+3*24*60*60*1000),resolved:false});
   document.getElementById('add-alert-btn').classList.remove('show');
-  saveSession(); // 💾 persist new disease alert
+  window.saveSession(); // background save
   renderDiseaseAlerts(); refreshSettingsDisplay();
   showToast('🚨 Alert added - we will check back in 3 days');
   document.querySelectorAll('.nav-item')[0].click();
@@ -1101,18 +1182,17 @@ function resolveAlert(id, resolved) {
   var a=diseaseAlerts.find(function(x){return x.id===id;}); if (!a) return;
   if (resolved) { a.resolved=true; showToast('✅ Alert removed for '+a.fieldName); }
   else { a.followupAt=new Date(Date.now()+3*24*60*60*1000); showToast('🔔 Will remind again in 3 days'); }
-  saveSession(); // 💾 persist alert change
+  window.saveSession(); // background save
   renderDiseaseAlerts(); checkFollowups(); refreshSettingsDisplay();
 }
 
 function clearAllAlerts() {
   if (!diseaseAlerts.length) { showToast('No alerts to clear'); return; }
   if (!confirm('Clear all disease alerts?')) return;
-  diseaseAlerts=[]; saveSession(); // 💾 persist cleared alerts
+  diseaseAlerts=[]; window.saveSession(); // background save
   renderDiseaseAlerts(); checkFollowups(); refreshSettingsDisplay(); showToast('✅ All alerts cleared');
 }
 
-// Replaced broken keys with native Gemini integrations provided by the environment
 function runCropAdvisor() {
   var btn = document.getElementById('crop-btn');
   var soil   = document.getElementById('c-soil').value.trim();
@@ -1124,7 +1204,6 @@ function runCropAdvisor() {
   btn.textContent = '⏳ Analysing...'; btn.disabled = true;
   document.getElementById('crop-results').style.display = 'none';
 
-  // Step 1: fetch live weather (OWM original logic preserved)
   var CROP_API_KEY = '4547ca5a3b066ec1425e46f56f24302b';
   var weatherPromise;
   if (farmerLat !== null && farmerLon !== null) {
@@ -1141,7 +1220,6 @@ function runCropAdvisor() {
   }
 
   weatherPromise.then(function(weatherCtx) {
-    // Step 2: Swap to native Gemini API to ensure no bugs/broken keys
     var prompt = 'Farmer details:' +
       '\n- Name: ' + (farmerData.name || 'Unknown') +
       '\n- Location: ' + (farmerData.village || 'India') +
@@ -1237,30 +1315,23 @@ function editField(fieldKey) {
   setTimeout(function(){document.getElementById('modal-input').focus();},100);
 }
 
-function saveModalField() {
+async function saveModalField() {
   var nv=document.getElementById('modal-input').value.trim();
   if (['name','village','numfields','fieldnames','crops'].includes(currentEditField)&&!nv){showToast('This field cannot be empty');return;}
   farmerData[currentEditField]=nv;
   if (currentEditField==='numfields') farmerData.numfields=parseInt(nv)||farmerData.numfields;
-  saveSession(); // 💾 persist settings change
+  await window.saveSession(); // await background save
   refreshSettingsDisplay(); closeModal(); showToast('✅ Updated!');
 }
 
 function closeModal() { document.getElementById('edit-modal').classList.remove('show'); }
 
-/* ═══════════════════════════════════
-   GOOGLE MAPS — LOGIN LOCATION PICKER
-   & DASHBOARD FARM MAP
-═══════════════════════════════════ */
 var GMAPS_KEY = 'jG0Q1fXfJs27876cISbI';
 var loginMap = null, loginMarker = null;
 var dashMap  = null, dashMarker  = null;
 var gmapsLoaded = false;
 
-// Called by Google Maps script callback
-function gmapsReady() {
-  gmapsLoaded = true;
-}
+function gmapsReady() { gmapsLoaded = true; }
 
 function initLoginMap(lat, lon) {
   document.getElementById('map-preview').style.display = 'block';
@@ -1276,15 +1347,12 @@ function initLoginMap(lat, lon) {
       fullscreenControl: false,
     });
 
-    // Click to move marker
     loginMap.addListener('click', function(e) {
       var pos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
       if (loginMarker) loginMarker.setPosition(pos);
       else {
         loginMarker = new google.maps.Marker({ position: pos, map: loginMap, draggable: true, title: 'Your farm' });
-        loginMarker.addListener('dragend', function(ev) {
-          reverseGeocode(ev.latLng.lat(), ev.latLng.lng());
-        });
+        loginMarker.addListener('dragend', function(ev) { reverseGeocode(ev.latLng.lat(), ev.latLng.lng()); });
       }
       reverseGeocode(pos.lat, pos.lng);
     });
@@ -1298,16 +1366,9 @@ function initLoginMap(lat, lon) {
     loginMarker = new google.maps.Marker({
       position: latlng, map: loginMap, draggable: true,
       title: 'Your farm',
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: '#2e7d32', fillOpacity: 1,
-        strokeColor: '#fff', strokeWeight: 2,
-      }
+      icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#2e7d32', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
     });
-    loginMarker.addListener('dragend', function(ev) {
-      reverseGeocode(ev.latLng.lat(), ev.latLng.lng());
-    });
+    loginMarker.addListener('dragend', function(ev) { reverseGeocode(ev.latLng.lat(), ev.latLng.lng()); });
   }
 }
 
@@ -1329,7 +1390,6 @@ function initDashboardMap(lat, lon) {
       title: farmerData.name ? farmerData.name + "'s Farm" : 'Your Farm',
       animation: google.maps.Animation.DROP,
     });
-    // Info window with farmer name
     var iw = new google.maps.InfoWindow({
       content: '<div style="font-family:sans-serif;font-size:13px;color:#1b2a1c;padding:2px 4px;">' +
                '🌾 <strong>' + (farmerData.name || 'Your Farm') + '</strong><br>' +
@@ -1347,12 +1407,10 @@ function reverseGeocode(lat, lon) {
   var status = document.getElementById('loc-status');
   farmerLat = lat; farmerLon = lon;
 
-  // Use Google Maps Geocoder
   var geocoder = new google.maps.Geocoder();
   geocoder.geocode({ location: { lat: lat, lng: lon } }, function(results, gstatus) {
     var place = '';
     if (gstatus === 'OK' && results[0]) {
-      // Extract village/city component
       var comps = results[0].address_components;
       var wanted = ['locality', 'sublocality', 'administrative_area_level_3', 'administrative_area_level_2'];
       for (var w = 0; w < wanted.length; w++) {
@@ -1361,7 +1419,6 @@ function reverseGeocode(lat, lon) {
         }
         if (place) break;
       }
-      // Add state
       for (var c2 = 0; c2 < comps.length; c2++) {
         if (comps[c2].types.indexOf('administrative_area_level_1') !== -1) {
           place = place ? place + ', ' + comps[c2].short_name : comps[c2].long_name; break;
@@ -1395,7 +1452,6 @@ function detectLocation() {
         initLoginMap(farmerLat, farmerLon);
         reverseGeocode(farmerLat, farmerLon);
       } else {
-        // Retry once Maps loads
         var tries = 0;
         var wait = setInterval(function() {
           tries++;
@@ -1407,7 +1463,6 @@ function detectLocation() {
     function(err) {
       status.style.color = 'var(--red)';
       status.textContent = err.code === 1 ? 'Permission denied. Type your village name.' : 'Could not get location.';
-      // Show India center map as fallback
       if (gmapsLoaded) initLoginMap(20.5937, 78.9629);
     },
     { enableHighAccuracy: true, timeout: 12000 }
@@ -1451,7 +1506,6 @@ function fmtReply(text) {
     .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
 }
 
-// Swapped to native Gemini integration for better stability and free API access!
 function sendChatMessage() {
   if (chatTyping) return;
   var input=document.getElementById('chat-input');
@@ -1467,10 +1521,9 @@ function sendChatMessage() {
 
   var sys='You are Kisan AI, a friendly farming assistant for Indian farmers. Help with crops, soil, irrigation, pests, diseases, fertilizers, weather, market tips. Use simple language. Keep answers practical and concise. Use bullet points for lists. Add relevant emojis.\n\nFarmer context - Name: '+farmerData.name+', Village: '+farmerData.village+', Crops: '+farmerData.crops+', Fields: '+farmerData.fieldnames+', Water: '+(farmerData.water||'unknown')+', Land: '+(farmerData.acres||'unknown')+' acres.';
 
-  const apiKey = ""; // Environment securely provisions this natively
+  const apiKey = "";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-  // format history for gemini
   const geminiHistory = chatHistory.map(function(m) {
     return {
       role: m.role === 'assistant' ? 'model' : 'user',
