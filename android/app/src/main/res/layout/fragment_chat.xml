@@ -11,27 +11,11 @@
     <!-- PAGE HEADER -->
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical" android:layout_marginBottom="12dp">
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="@string/title_chat" style="@style/PageTitle" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text=" LLM" android:textSize="10.5sp" android:textColor="@color/tag_ai_text"
-                android:background="@drawable/bg_tag_ai"
-                android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="2dp" android:paddingBottom="2dp"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/title_chat" style="@style/PageTitle" />
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="@string/subtitle_chat" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
     </LinearLayout>
-
-    <!-- API BANNER -->
-    <TextView
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="🔌 Backend hook: POST /api/chat/message · Send {message, history} · Receive {reply}"
-        android:textSize="12sp" android:textColor="#c45400"
-        android:background="@drawable/bg_api_banner"
-        android:padding="10dp" android:layout_marginBottom="12dp" />
 
     <!-- CHAT CONTAINER -->
     <LinearLayout
@@ -42,30 +26,6 @@
         android:background="@drawable/bg_card"
         android:layout_marginBottom="12dp">
 
-        <!-- Chat header -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@color/green_800"
-            android:padding="12dp">
-
-            <View
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/bg_progress_fill_green"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/chat_assistant_name"
-                android:textSize="13sp"
-                android:textColor="#cde8cf"
-                android:textStyle="bold" />
-        </LinearLayout>
-
         <!-- Messages list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_chat_messages"
@@ -74,6 +34,101 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:clipToPadding="false" />
+
+        <!-- Empty state: suggestion cards (shown when no messages) -->
+        <ScrollView
+            android:id="@+id/sv_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="visible"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🤖" android:textSize="36sp" android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Agro Mind AI" android:textSize="14sp"
+                    android:textColor="@color/text_700" android:textStyle="bold"
+                    android:gravity="center" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Your expert advisor for Indian agriculture"
+                    android:textSize="12sp" android:textColor="@color/text_300"
+                    android:gravity="center" android:layout_marginBottom="20dp" />
+
+                <!-- Suggestion cards grid (2 columns via nested LinearLayouts) -->
+                <LinearLayout
+                    android:id="@+id/ll_suggestions_row1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tv_suggestion_0"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_card"
+                        android:padding="12dp"
+                        android:textSize="12.5sp"
+                        android:textColor="@color/text_700"
+                        android:text="How much fertiliser should I apply for wheat?" />
+
+                    <TextView
+                        android:id="@+id/tv_suggestion_1"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_card"
+                        android:padding="12dp"
+                        android:textSize="12.5sp"
+                        android:textColor="@color/text_700"
+                        android:text="What is the MSP for rice this year?" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_suggestions_row2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_suggestion_2"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_card"
+                        android:padding="12dp"
+                        android:textSize="12.5sp"
+                        android:textColor="@color/text_700"
+                        android:text="How do I treat leaf blight in cotton?" />
+
+                    <TextView
+                        android:id="@+id/tv_suggestion_3"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_card"
+                        android:padding="12dp"
+                        android:textSize="12.5sp"
+                        android:textColor="@color/text_700"
+                        android:text="Recommend intercropping for mustard" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
 
         <!-- Divider -->
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -112,18 +167,5 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- QUICK CHIPS -->
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:id="@+id/ll_quick_chips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="4dp" />
-    </HorizontalScrollView>
-
 </LinearLayout>
+

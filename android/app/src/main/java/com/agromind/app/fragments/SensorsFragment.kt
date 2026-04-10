@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.agromind.app.adapters.SensorAdapter
 import com.agromind.app.databinding.FragmentSensorsBinding
 import com.agromind.app.utils.MockData
@@ -28,33 +28,14 @@ class SensorsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupGauges()
-        setupSensorList()
+        setupSensorGrid()
         setupButtons()
     }
 
-    private fun setupGauges() {
-        // Soil temp gauge — 48% of max (24°C out of ~50°C max)
-        setGaugeFill(binding.viewGaugeTempFill, 48)
-        // Soil moisture gauge — 68%
-        setGaugeFill(binding.viewGaugeMoistureFill, 68)
-        // Light index gauge — 72% (7.2 klx out of ~10 klx)
-        setGaugeFill(binding.viewGaugeLightFill, 72)
-    }
-
-    private fun setGaugeFill(fillView: View, percent: Int) {
-        fillView.post {
-            val parentWidth = (fillView.parent as? ViewGroup)?.width ?: return@post
-            val lp = fillView.layoutParams
-            lp.width = (parentWidth * percent / 100f).toInt()
-            fillView.layoutParams = lp
-        }
-    }
-
-    private fun setupSensorList() {
+    private fun setupSensorGrid() {
         sensorAdapter = SensorAdapter(MockData.sensors)
         binding.rvSensors.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = sensorAdapter
             isNestedScrollingEnabled = false
         }

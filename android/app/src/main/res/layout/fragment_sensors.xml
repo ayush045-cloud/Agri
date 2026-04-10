@@ -14,137 +14,32 @@
 
         <!-- PAGE HEADER -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/title_sensors" style="@style/PageTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/subtitle_sensors" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
-            </LinearLayout>
+            android:orientation="vertical" android:layout_marginBottom="14dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/title_sensors" style="@style/PageTitle" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/subtitle_sensors" style="@style/PageSubtitle" android:layout_marginTop="3dp" />
+        </LinearLayout>
+
+        <!-- SENSOR CARDS GRID -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_sensors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp" />
+
+        <!-- EXPORT BUTTON -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end">
+
             <Button android:id="@+id/btn_export_csv"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/export_csv" style="@style/BtnSecondary" />
         </LinearLayout>
 
-        <!-- API BANNER -->
-        <TextView
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="🔌 Backend hook: GET /api/sensors/live · Polling every 30s"
-            android:textSize="12sp" android:textColor="#c45400"
-            android:background="@drawable/bg_api_banner"
-            android:padding="12dp" android:layout_marginBottom="16dp" />
-
-        <!-- GAUGE CARDS row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="14dp">
-
-            <!-- Soil Temperature -->
-            <LinearLayout
-                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card"
-                android:padding="14dp"
-                android:gravity="center"
-                android:layout_marginEnd="6dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="🌡 Soil Temp" android:textSize="12sp" android:textColor="@color/text_700"
-                    android:textStyle="bold" android:gravity="center" android:layout_marginBottom="8dp" />
-                <TextView android:id="@+id/tv_gauge_temp"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="24°C" android:textSize="26sp" android:textColor="@color/text_900"
-                    android:textStyle="bold" android:fontFamily="serif" android:gravity="center" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/avg_all_sensors" android:textSize="10sp"
-                    android:textColor="@color/text_300" android:gravity="center"
-                    android:layout_marginTop="4dp" android:layout_marginBottom="8dp" />
-                <FrameLayout android:layout_width="match_parent" android:layout_height="6dp"
-                    android:background="@drawable/bg_progress_track">
-                    <View android:layout_width="0dp" android:layout_height="match_parent"
-                        android:id="@+id/view_gauge_temp_fill"
-                        android:background="@drawable/bg_progress_fill_green" />
-                </FrameLayout>
-            </LinearLayout>
-
-            <!-- Soil Moisture -->
-            <LinearLayout
-                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card"
-                android:padding="14dp"
-                android:gravity="center"
-                android:layout_marginEnd="6dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="💧 Moisture" android:textSize="12sp" android:textColor="@color/text_700"
-                    android:textStyle="bold" android:gravity="center" android:layout_marginBottom="8dp" />
-                <TextView android:id="@+id/tv_gauge_moisture"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="68%" android:textSize="26sp" android:textColor="@color/text_900"
-                    android:textStyle="bold" android:fontFamily="serif" android:gravity="center" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/field_weighted_avg" android:textSize="10sp"
-                    android:textColor="@color/text_300" android:gravity="center"
-                    android:layout_marginTop="4dp" android:layout_marginBottom="8dp" />
-                <FrameLayout android:layout_width="match_parent" android:layout_height="6dp"
-                    android:background="@drawable/bg_progress_track">
-                    <View android:layout_width="0dp" android:layout_height="match_parent"
-                        android:id="@+id/view_gauge_moisture_fill"
-                        android:background="@drawable/bg_progress_fill_green" />
-                </FrameLayout>
-            </LinearLayout>
-
-            <!-- Light Index -->
-            <LinearLayout
-                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card"
-                android:padding="14dp"
-                android:gravity="center">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="☀ Light" android:textSize="12sp" android:textColor="@color/text_700"
-                    android:textStyle="bold" android:gravity="center" android:layout_marginBottom="8dp" />
-                <TextView android:id="@+id/tv_gauge_light"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="7.2 klx" android:textSize="26sp" android:textColor="@color/text_900"
-                    android:textStyle="bold" android:fontFamily="serif" android:gravity="center" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/solar_radiation" android:textSize="10sp"
-                    android:textColor="@color/text_300" android:gravity="center"
-                    android:layout_marginTop="4dp" android:layout_marginBottom="8dp" />
-                <FrameLayout android:layout_width="match_parent" android:layout_height="6dp"
-                    android:background="@drawable/bg_progress_track">
-                    <View android:layout_width="0dp" android:layout_height="match_parent"
-                        android:id="@+id/view_gauge_light_fill"
-                        android:background="@drawable/bg_progress_fill_green" />
-                </FrameLayout>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- SENSOR STATUS CARD -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="18dp">
-
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="📡 " android:textSize="16sp" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/sensor_status" style="@style/CardTitle" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_sensors"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-        </LinearLayout>
-
     </LinearLayout>
 </ScrollView>
+

@@ -15,7 +15,7 @@
 
     <!-- Page titles / subtitles -->
     <string name="title_dashboard">Farm Overview</string>
-    <string name="subtitle_dashboard">Real-time status across all monitored fields — Season: Rabi 2025</string>
+    <string name="subtitle_dashboard">Real-time status across all monitored fields</string>
     <string name="title_irrigation">Smart Irrigation</string>
     <string name="subtitle_irrigation">AI-optimised watering schedule based on soil, weather &amp; crop data</string>
     <string name="title_disease">Disease Detection</string>
@@ -25,15 +25,26 @@
     <string name="title_chat">Farm AI Chat</string>
     <string name="subtitle_chat">Conversational assistant for crop advice, disease management &amp; market info</string>
     <string name="title_sensors">Sensors &amp; Data</string>
-    <string name="subtitle_sensors">Live readings from all field IoT sensors</string>
+    <string name="subtitle_sensors">Live IoT sensor readings — updated in real-time</string>
     <string name="title_settings">Settings</string>
     <string name="subtitle_settings">Configure automation, alerts, and data sources</string>
 
     <!-- Stat labels -->
-    <string name="stat_water_saved">Water Saved Today</string>
-    <string name="stat_soil_moisture">Avg Soil Moisture</string>
-    <string name="stat_active_fields">Active Fields</string>
-    <string name="stat_disease_alerts">Disease Alerts</string>
+    <string name="stat_total_fields">Total Fields</string>
+    <string name="stat_total_fields_sub">Active monitoring</string>
+    <string name="stat_active_sensors">Active Sensors</string>
+    <string name="stat_active_sensors_sub">Online now</string>
+    <string name="stat_water_today">Water Today</string>
+    <string name="stat_water_today_sub">Total used</string>
+    <string name="stat_system">System</string>
+    <string name="stat_system_value">Operational</string>
+    <string name="stat_system_sub">All systems go</string>
+
+    <!-- Dashboard new sections -->
+    <string name="todays_irrigation_schedule">Today\'s Irrigation Schedule</string>
+    <string name="mandi_prices_title">Mandi Market Prices</string>
+    <string name="mandi_prices_sub">MSP &amp; APMC rates · Updated daily</string>
+    <string name="mandi_source">Source: APMC / e-NAM</string>
 
     <!-- Dashboard -->
     <string name="soil_moisture_by_field">Soil Moisture by Field</string>

@@ -11,8 +11,6 @@ import com.agromind.app.adapters.ChatAdapter
 import com.agromind.app.databinding.FragmentChatBinding
 import com.agromind.app.models.ChatMessage
 import com.agromind.app.models.MessageRole
-import com.agromind.app.utils.MockData
-import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
 
 class ChatFragment : Fragment() {
@@ -25,6 +23,13 @@ class ChatFragment : Fragment() {
 
     private var chatMockIndex = 0
 
+    private val suggestions = listOf(
+        "How much fertiliser should I apply for wheat?",
+        "What is the MSP for rice this year?",
+        "How do I treat leaf blight in cotton?",
+        "Recommend intercropping for mustard"
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,46 +41,31 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupChatList()
-        setupQuickChips()
+        setupSuggestions()
         setupInput()
     }
 
     private fun setupChatList() {
-        val initialMessages = mutableListOf(
-            ChatMessage(getString(com.agromind.app.R.string.chat_intro), MessageRole.AI)
-        )
-        chatAdapter = ChatAdapter(initialMessages)
+        chatAdapter = ChatAdapter(mutableListOf())
         binding.rvChatMessages.apply {
             layoutManager = LinearLayoutManager(requireContext()).also { it.stackFromEnd = true }
             adapter = chatAdapter
         }
+        updateEmptyState()
     }
 
-    private fun setupQuickChips() {
-        val chipsContainer = binding.llQuickChips
-        chipsContainer.removeAllViews()
-
-        MockData.quickChatChips.forEach { (label, message) ->
-            val chip = MaterialButton(
-                requireContext(),
-                null,
-                com.google.android.material.R.attr.materialButtonOutlinedStyle
-            ).apply {
-                text = label
-                textSize = 12.5f
-                setPadding(32, 20, 32, 20)
-                insetTop = 0
-                insetBottom = 0
-                cornerRadius = resources.getDimensionPixelSize(com.agromind.app.R.dimen.radius_full)
-                val lp = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                lp.marginEnd = 8
-                layoutParams = lp
-                setOnClickListener { sendMessage(message) }
+    private fun setupSuggestions() {
+        val suggestionViews = listOf(
+            binding.tvSuggestion0,
+            binding.tvSuggestion1,
+            binding.tvSuggestion2,
+            binding.tvSuggestion3
+        )
+        suggestions.forEachIndexed { index, text ->
+            suggestionViews.getOrNull(index)?.apply {
+                this.text = text
+                setOnClickListener { sendMessage(text) }
             }
-            chipsContainer.addView(chip)
         }
     }
 
@@ -98,6 +88,7 @@ class ChatFragment : Fragment() {
 
         // Add user message
         chatAdapter.addMessage(ChatMessage(text, MessageRole.USER))
+        updateEmptyState()
         scrollToBottom()
 
         // Disable send while "thinking"
@@ -122,7 +113,7 @@ class ChatFragment : Fragment() {
 
             // Remove typing indicator and add real reply
             chatAdapter.removeTypingIndicator()
-            val reply = MockData.chatMocks[chatMockIndex % MockData.chatMocks.size]
+            val reply = com.agromind.app.utils.MockData.chatMocks[chatMockIndex % com.agromind.app.utils.MockData.chatMocks.size]
             chatMockIndex++
             chatAdapter.addMessage(ChatMessage(reply, MessageRole.AI))
             scrollToBottom()
@@ -130,6 +121,12 @@ class ChatFragment : Fragment() {
             binding.btnSend.isEnabled = true
             binding.btnSend.text = getString(com.agromind.app.R.string.send)
         }
+    }
+
+    private fun updateEmptyState() {
+        val hasMessages = chatAdapter.itemCount > 0
+        binding.svSuggestions.visibility = if (hasMessages) View.GONE else View.VISIBLE
+        binding.rvChatMessages.visibility = if (hasMessages) View.VISIBLE else View.GONE
     }
 
     private fun scrollToBottom() {

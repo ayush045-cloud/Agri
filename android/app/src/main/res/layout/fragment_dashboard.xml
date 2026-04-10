@@ -17,36 +17,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:orientation="vertical"
             android:layout_marginBottom="20dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_dashboard"
-                    style="@style/PageTitle" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/subtitle_dashboard"
-                    style="@style/PageSubtitle"
-                    android:layout_marginTop="3dp" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_add_field"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_field"
-                style="@style/BtnPrimary" />
+                android:text="@string/title_dashboard"
+                style="@style/PageTitle" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subtitle_dashboard"
+                style="@style/PageSubtitle"
+                android:layout_marginTop="3dp" />
         </LinearLayout>
 
         <!-- ── STAT CARDS — row 1 ── -->
@@ -56,81 +41,60 @@
             android:orientation="horizontal"
             android:layout_marginBottom="12dp">
 
-            <!-- Water Saved -->
+            <!-- Total Fields -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card"
-                android:elevation="0dp">
+                android:background="@drawable/bg_stat_card_green"
+                android:padding="16dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="@drawable/gradient_stat_green" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🌾" android:textSize="24sp" android:layout_marginBottom="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                <TextView
+                    android:id="@+id/tv_stat_fields"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="5" android:textSize="24sp" android:textColor="#ffffff"
+                    android:textStyle="bold" android:layout_marginBottom="3dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="💧" android:textSize="24sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_total_fields" android:textSize="12sp"
+                    android:textColor="#ccffffff" android:layout_marginBottom="2dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/stat_water_saved" style="@style/StatLabel" />
-
-                    <TextView
-                        android:id="@+id/tv_stat_water"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="1,840 L" style="@style/StatValue"
-                        android:layout_marginTop="4dp" android:layout_marginBottom="3dp" />
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="↑ 12% vs yesterday" android:textSize="11.5sp"
-                        android:textColor="@color/green_500" />
-                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_total_fields_sub" android:textSize="11sp"
+                    android:textColor="#99ffffff" />
             </LinearLayout>
 
-            <!-- Avg Soil Moisture -->
+            <!-- Active Sensors -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card">
+                android:background="@drawable/bg_stat_card_blue"
+                android:padding="16dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="@drawable/gradient_stat_amber" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📡" android:textSize="24sp" android:layout_marginBottom="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                <TextView
+                    android:id="@+id/tv_stat_sensors"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="5" android:textSize="24sp" android:textColor="#ffffff"
+                    android:textStyle="bold" android:layout_marginBottom="3dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🌱" android:textSize="24sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_active_sensors" android:textSize="12sp"
+                    android:textColor="#ccffffff" android:layout_marginBottom="2dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/stat_soil_moisture" style="@style/StatLabel" />
-
-                    <TextView
-                        android:id="@+id/tv_stat_moisture"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="68%" style="@style/StatValue"
-                        android:layout_marginTop="4dp" android:layout_marginBottom="3dp" />
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="↑ Optimal range" android:textSize="11.5sp"
-                        android:textColor="@color/green_500" />
-                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_active_sensors_sub" android:textSize="11sp"
+                    android:textColor="#99ffffff" />
             </LinearLayout>
         </LinearLayout>
 
@@ -141,80 +105,61 @@
             android:orientation="horizontal"
             android:layout_marginBottom="16dp">
 
-            <!-- Active Fields -->
+            <!-- Water Today -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card">
+                android:background="@drawable/bg_stat_card_green_dark"
+                android:padding="16dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="@drawable/gradient_stat_blue" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💧" android:textSize="24sp" android:layout_marginBottom="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                <TextView
+                    android:id="@+id/tv_stat_water"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="1,840 L" android:textSize="24sp" android:textColor="#ffffff"
+                    android:textStyle="bold" android:layout_marginBottom="3dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🌾" android:textSize="24sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_water_today" android:textSize="12sp"
+                    android:textColor="#ccffffff" android:layout_marginBottom="2dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/stat_active_fields" style="@style/StatLabel" />
-
-                    <TextView
-                        android:id="@+id/tv_stat_fields"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="6" style="@style/StatValue"
-                        android:layout_marginTop="4dp" android:layout_marginBottom="3dp" />
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="4 irrigated today" android:textSize="11.5sp"
-                        android:textColor="@color/text_300" />
-                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_water_today_sub" android:textSize="11sp"
+                    android:textColor="#99ffffff" />
             </LinearLayout>
 
-            <!-- Disease Alerts -->
+            <!-- System Status -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card">
+                android:background="@drawable/bg_stat_card_system"
+                android:padding="16dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="@drawable/gradient_stat_red" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🟢" android:textSize="24sp" android:layout_marginBottom="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                <TextView
+                    android:id="@+id/tv_stat_system"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_system_value" android:textSize="18sp"
+                    android:textColor="#ffffff" android:textStyle="bold"
+                    android:layout_marginBottom="3dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="⚠️" android:textSize="24sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_system" android:textSize="12sp"
+                    android:textColor="#ccffffff" android:layout_marginBottom="2dp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/stat_disease_alerts" style="@style/StatLabel" />
-
-                    <TextView
-                        android:id="@+id/tv_stat_disease"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="2" style="@style/StatValue"
-                        android:layout_marginTop="4dp" android:layout_marginBottom="3dp" />
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Wheat blight risk" android:textSize="11.5sp"
-                        android:textColor="@color/red_600" />
-                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stat_system_sub" android:textSize="11sp"
+                    android:textColor="#99ffffff" />
             </LinearLayout>
         </LinearLayout>
 
@@ -280,7 +225,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/bg_card"
-            android:padding="18dp">
+            android:padding="18dp"
+            android:layout_marginBottom="14dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -303,6 +249,149 @@
                 android:gravity="bottom"
                 android:paddingBottom="4dp" />
 
+        </LinearLayout>
+
+        <!-- ── TODAY'S IRRIGATION SCHEDULE CARD ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="18dp"
+                android:paddingBottom="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📅 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/todays_irrigation_schedule" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="@color/border" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_dashboard_schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+
+        <!-- ── MANDI MARKET PRICES CARD ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🏪 " android:textSize="16sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/mandi_prices_title" style="@style/CardTitle" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mandi_prices_sub"
+                android:textSize="11sp"
+                android:textColor="@color/text_300"
+                android:layout_marginBottom="14dp" />
+
+            <!-- Wheat -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Wheat" android:textSize="13sp"
+                    android:textColor="@color/text_700" android:textStyle="bold" />
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:gravity="end">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="₹2,275/qtl" android:textSize="13sp"
+                        android:textColor="@color/green_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="↑ +₹45" android:textSize="11sp" android:textColor="@color/green_400" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Rice -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Rice" android:textSize="13sp"
+                    android:textColor="@color/text_700" android:textStyle="bold" />
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:gravity="end">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="₹2,183/qtl" android:textSize="13sp"
+                        android:textColor="@color/green_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="↔ Stable" android:textSize="11sp" android:textColor="@color/text_300" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Cotton -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Cotton" android:textSize="13sp"
+                    android:textColor="@color/text_700" android:textStyle="bold" />
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:gravity="end">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="₹6,620/qtl" android:textSize="13sp"
+                        android:textColor="@color/green_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="↑ +₹120" android:textSize="11sp" android:textColor="@color/green_400" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Mustard -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Mustard" android:textSize="13sp"
+                    android:textColor="@color/text_700" android:textStyle="bold" />
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:gravity="end">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="₹5,650/qtl" android:textSize="13sp"
+                        android:textColor="@color/green_700" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="↓ -₹30" android:textSize="11sp" android:textColor="@color/red_600" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="@color/border" android:layout_marginBottom="10dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/mandi_source" android:textSize="10sp"
+                android:textColor="@color/text_300" />
         </LinearLayout>
 
     </LinearLayout>

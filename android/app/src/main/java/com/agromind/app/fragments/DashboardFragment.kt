@@ -13,10 +13,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.agromind.app.adapters.AlertsAdapter
+import com.agromind.app.adapters.ScheduleAdapter
 import com.agromind.app.adapters.SoilMoistureAdapter
 import com.agromind.app.databinding.FragmentDashboardBinding
 import com.agromind.app.utils.MockData
-import com.google.android.material.snackbar.Snackbar
 
 class DashboardFragment : Fragment() {
 
@@ -25,6 +25,7 @@ class DashboardFragment : Fragment() {
 
     private lateinit var soilAdapter: SoilMoistureAdapter
     private lateinit var alertsAdapter: AlertsAdapter
+    private lateinit var scheduleAdapter: ScheduleAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,9 +37,19 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupStatCards()
         setupRecyclerViews()
         renderBarChart()
-        setupButtons()
+    }
+
+    private fun setupStatCards() {
+        val totalFields = MockData.soilMoisture.size
+        val activeSensors = MockData.sensors.count { it.status == com.agromind.app.models.SensorStatus.ONLINE }
+        val waterToday = MockData.waterChart.lastOrNull()?.litres ?: 0
+
+        binding.tvStatFields.text = totalFields.toString()
+        binding.tvStatSensors.text = activeSensors.toString()
+        binding.tvStatWater.text = "%,d L".format(waterToday)
     }
 
     private fun setupRecyclerViews() {
@@ -53,6 +64,13 @@ class DashboardFragment : Fragment() {
         binding.rvAlerts.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = alertsAdapter
+            isNestedScrollingEnabled = false
+        }
+
+        scheduleAdapter = ScheduleAdapter(MockData.schedule)
+        binding.rvDashboardSchedule.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = scheduleAdapter
             isNestedScrollingEnabled = false
         }
     }
@@ -115,12 +133,6 @@ class DashboardFragment : Fragment() {
             // Add column with equal weight to the chart container
             val colLp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f)
             chartContainer.addView(columnLayout, colLp)
-        }
-    }
-
-    private fun setupButtons() {
-        binding.btnAddField.setOnClickListener {
-            Snackbar.make(it, "➕ Field creation form will open here", Snackbar.LENGTH_SHORT).show()
         }
     }
 

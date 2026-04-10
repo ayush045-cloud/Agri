@@ -25,7 +25,8 @@ class SensorAdapter(private var items: List<SensorReading>) :
         val item = items[position]
         val ctx = holder.itemView.context
         with(holder.binding) {
-            tvSensorIdField.text = "${item.id} · ${item.field}"
+            tvSensorIdField.text = item.id
+            tvSensorField.text = item.field
             tvSensorInfo.text    = item.info
 
             val (bgRes, textColorRes, label) = when (item.status) {
