@@ -18,6 +18,8 @@ import com.agromind.app.adapters.SoilMoistureAdapter
 import com.agromind.app.databinding.FragmentDashboardBinding
 import com.agromind.app.utils.MockData
 
+import java.util.Locale
+
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
@@ -49,7 +51,7 @@ class DashboardFragment : Fragment() {
 
         binding.tvStatFields.text = totalFields.toString()
         binding.tvStatSensors.text = activeSensors.toString()
-        binding.tvStatWater.text = "%,d L".format(waterToday)
+        binding.tvStatWater.text = String.format(Locale.getDefault(), "%,d L", waterToday)
     }
 
     private fun setupRecyclerViews() {
