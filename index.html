@@ -17,7 +17,21 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Noto Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
-  #login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(160deg,#1b5e20 0%,#2e7d32 40%,#43a047 100%); padding:20px; }
+  /* Added Loading Screen CSS */
+  #app-loading {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg,#1b5e20 0%,#2e7d32 40%,#43a047 100%);
+    flex-direction: column;
+    color: white;
+    font-family: 'Baloo 2', cursive;
+  }
+  .pulse-icon { font-size: 64px; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+
+  #login-screen { display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(160deg,#1b5e20 0%,#2e7d32 40%,#43a047 100%); padding:20px; }
   .login-box { background:#fff; border-radius:24px; padding:36px 32px 32px; width:100%; max-width:500px; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
   .login-logo { text-align:center; margin-bottom:24px; }
   .login-logo .logo-icon { font-size:52px; display:block; margin-bottom:6px; }
@@ -253,6 +267,12 @@
 </style>
 </head>
 <body>
+
+<!-- INITIAL LOADING SCREEN TO CHECK CLOUD SESSION -->
+<div id="app-loading">
+  <div class="pulse-icon">🌾</div>
+  <h2 style="margin-top: 16px; font-weight: 800; font-size: 24px;">Loading Agro Mind...</h2>
+</div>
 
 <div id="login-screen">
   <div class="login-box">
@@ -568,63 +588,147 @@
 
 <div id="toast"></div>
 
+<!-- FIREBASE CLOUD SESSION SYSTEM -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+  const appId = typeof __app_id !== 'undefined' ? __app_id : 'agromind-app';
+
+  window.firebaseDb = null;
+  window.firebaseUser = null;
+
+  async function bootApp() {
+    if (!firebaseConfig) {
+      // Fallback if running purely local HTML file outside platform.
+      console.warn("Cloud persistence is unavailable locally. Data won't save on reload.");
+      showLogin();
+      return;
+    }
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      window.firebaseDb = getFirestore(app);
+
+      // RULE 3: Auth Before Queries
+      const initAuth = async () => {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      };
+      await initAuth();
+
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          window.firebaseUser = user;
+          await loadSessionFromCloud();
+        } else {
+          showLogin();
+        }
+      });
+    } catch (e) {
+      console.error("Firebase init failed:", e);
+      showLogin();
+    }
+  }
+
+  async function loadSessionFromCloud() {
+    try {
+      // RULE 1: Strict Paths
+      const docRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.farmerData && data.farmerData.name) {
+          window.farmerData = data.farmerData;
+          if (Array.isArray(data.diseaseAlerts)) {
+            window.diseaseAlerts = data.diseaseAlerts.map(a => ({
+              ...a,
+              addedAt: a.addedAt ? new Date(a.addedAt) : null,
+              followupAt: a.followupAt ? new Date(a.followupAt) : null
+            }));
+          }
+          if (data.lastIrrData) window.lastIrrData = data.lastIrrData;
+
+          // Pre-fill fields just in case they log out and want to edit
+          const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+          setVal('l-name',       window.farmerData.name);
+          setVal('l-village',    window.farmerData.village);
+          setVal('l-numfields',  window.farmerData.numfields);
+          setVal('l-acres',      window.farmerData.acres);
+          setVal('l-fieldnames', window.farmerData.fieldnames);
+          setVal('l-crops',      window.farmerData.crops);
+          setVal('l-water',      window.farmerData.water);
+          setVal('l-notes',      window.farmerData.notes);
+
+          window._restoredFromCookie = true; 
+          document.getElementById('app-loading').style.display = 'none';
+          window.initApp();
+          return;
+        }
+      }
+      showLogin();
+    } catch (e) {
+      console.error("Load session error", e);
+      showLogin();
+    }
+  }
+
+  function showLogin() {
+    document.getElementById('app-loading').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
+  // Global save method that writes to Firestore seamlessly
+  window.saveSession = async function() {
+    if (!window.firebaseDb || !window.firebaseUser) return;
+    try {
+      const docRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
+      const safeAlerts = window.diseaseAlerts.map(a => ({
+        ...a,
+        addedAt: a.addedAt ? (a.addedAt instanceof Date ? a.addedAt.toISOString() : a.addedAt) : null,
+        followupAt: a.followupAt ? (a.followupAt instanceof Date ? a.followupAt.toISOString() : a.followupAt) : null
+      }));
+      await setDoc(docRef, {
+        farmerData: window.farmerData,
+        diseaseAlerts: safeAlerts,
+        lastIrrData: window.lastIrrData
+      });
+    } catch (e) {
+      console.error("Save session error", e);
+    }
+  };
+
+  // Global clear method for logout
+  window.clearSession = async function() {
+    if (!window.firebaseDb || !window.firebaseUser) return;
+    try {
+      const docRef = doc(window.firebaseDb, 'artifacts', appId, 'users', window.firebaseUser.uid, 'profile', 'data');
+      await setDoc(docRef, {});
+    } catch (e) {}
+  };
+
+  bootApp();
+</script>
+
 <script>
-/* ╔══════════════════════════════════════════════════════════════════╗
-   ║              AGRO MIND — COMPLETE API REFERENCE                  ║
-   ║  Replace API URL below with your server when ready.             ║
-   ║  All endpoints below send farmerData as part of the payload.    ║
-   ╠══════════════════════════════════════════════════════════════════╣
-   ║  BACKEND FLASK ENDPOINTS NEEDED:                                 ║
-   ║                                                                  ║
-   ║  POST /api/dashboard                                             ║
-   ║    IN:  { farmer }                                               ║
-   ║    OUT: { fields[], alerts[], next_irrigation, needs_attention } ║
-   ║                                                                  ║
-   ║  POST /api/irrigation/schedule                                   ║
-   ║    IN:  { farmer, fields[{name,crop,last_irrigated,note}] }      ║
-   ║    OUT: { ai_suggestion, fields[{name,crop,status,when,         ║
-   ║            water_needed,crop_stage}] }                           ║
-   ║                                                                  ║
-   ║  POST /api/irrigation/run                                        ║
-   ║    IN:  { started_at, duration_minutes, field, farmer }         ║
-   ║    OUT: { message }                                              ║
-   ║                                                                  ║
-   ║  POST /api/irrigation/stop                                       ║
-   ║    IN:  {}                                                       ║
-   ║    OUT: { message }                                              ║
-   ║                                                                  ║
-   ║  POST /api/disease/analyze                                       ║
-   ║    IN:  { image (base64), farmer }                               ║
-   ║    OUT: { type, title, treatment }                               ║
-   ║         type = 'healthy' | 'warning' | 'danger'                 ║
-   ║                                                                  ║
-   ║  POST /api/crops/recommend                                       ║
-   ║    IN:  { soil, season, water, farmer }                          ║
-   ║    OUT: { crops[{name,emoji,why}] }                              ║
-   ║                                                                  ║
-   ║  POST /api/chat/message  (MODE B — see sendChatMessage below)   ║
-   ║    IN:  { message, history[], farmer }                           ║
-   ║    OUT: { reply }                                                ║
-   ║                                                                  ║
-   ║  GET  /api/weather  (or use OpenWeatherMap key below directly)  ║
-   ║    OUT: { display, temp, humidity, wind, description, icon }    ║
-   ╚══════════════════════════════════════════════════════════════════╝ */
+// Prevent TypeError if synchronous code triggers saveSession before module loads
+window.saveSession = window.saveSession || async function() {};
+window.clearSession = window.clearSession || async function() {};
 
-/* ── KEYS — fill these in ────────────────────────────────────────────
-   ANTHROPIC_KEY : get from console.anthropic.com → API Keys
-   OWM_KEY       : already set below (OpenWeatherMap — free tier)
-   GMAPS_KEY     : already set in <script> tag in <head>
-   API           : your Flask server URL
-──────────────────────────────────────────────────────────────────── */
-var ANTHROPIC_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE'; // ← PASTE YOUR NEW KEY HERE
-
-var API = 'http://127.0.0.1:5000'; // ← change to your server when deployed
+var API = 'http://127.0.0.1:5000';
 var farmerData = {};
 var currentEditField = '';
 var diseaseAlerts = [];
 var lastDiseaseResult = null;
 var chatHistory = [];
 var chatTyping = false;
+var lastIrrData = {};
 
 function doLogin() {
   var name = document.getElementById('l-name').value.trim();
@@ -651,6 +755,7 @@ function doLogin() {
     water: document.getElementById('l-water').value.trim(),
     notes: document.getElementById('l-notes').value.trim()
   };
+  saveSession(); // 💾 persist farmer profile to Firebase
   initApp();
 }
 
@@ -663,6 +768,12 @@ function initApp() {
   document.getElementById('app').classList.add('visible');
   loadDashboard();
   loadWeather();
+
+  // Welcome-back toast if restored from cloud
+  if (window._restoredFromCookie) {
+    window._restoredFromCookie = false;
+    showToast('👋 Welcome back, ' + farmerData.name + '!');
+  }
 
   // Show farm map on dashboard using coords from login (if captured)
   if (farmerLat !== null && farmerLon !== null) {
@@ -680,6 +791,8 @@ function initApp() {
 }
 
 function doLogout() {
+  clearSession(); // 🗑️ wipe cloud session
+  farmerData = {}; lastIrrData = {};
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').classList.remove('visible');
   diseaseAlerts = []; lastDiseaseResult = null; chatHistory = [];
@@ -814,13 +927,19 @@ function renderLastIrrFields() {
   var cropList = farmerData.crops ? farmerData.crops.split(',').map(function(s) { return s.trim(); }) : [];
   document.getElementById('last-irr-fields').innerHTML = names.map(function(name, i) {
     var crop = cropList[i] || cropList[0] || '';
-    return '<div class="last-irr-field-card"><div class="last-irr-field-name">' + name + '</div><div class="last-irr-field-crop">' + crop + '</div><label class="last-irr-label">Last watered on:</label><input class="last-irr-input" type="date" id="last-irr-' + i + '" max="' + new Date().toISOString().split('T')[0] + '"></div>';
+    var savedDate = (lastIrrData[name] && lastIrrData[name].date) ? lastIrrData[name].date : '';
+    return '<div class="last-irr-field-card"><div class="last-irr-field-name">' + name + '</div><div class="last-irr-field-crop">' + crop + '</div><label class="last-irr-label">Last watered on:</label><input class="last-irr-input" type="date" id="last-irr-' + i + '" max="' + new Date().toISOString().split('T')[0] + '" value="' + savedDate + '"></div>';
   }).join('');
 }
 
 function submitLastIrrigation() {
   var names = farmerData.fieldnames.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
-  var entries = names.map(function(name, i) { return { field: name, last_watered: document.getElementById('last-irr-'+i).value || null }; });
+  var entries = names.map(function(name, i) {
+    var dateVal = document.getElementById('last-irr-'+i) ? document.getElementById('last-irr-'+i).value : '';
+    lastIrrData[name] = { date: dateVal }; // save per-field date
+    return { field: name, last_watered: dateVal || null };
+  });
+  saveSession(); // 💾 persist irrigation dates
   document.getElementById('last-irr-section').style.display = 'none';
   document.getElementById('irr-result-section').style.display = 'block';
   fetch(API + '/api/irrigation/schedule', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({entries:entries,farmer:farmerData}) })
@@ -947,8 +1066,9 @@ function addDiseaseAlert() {
   var fn=prompt('Which field has this problem?'); if (fn===null) return;
   diseaseAlerts.push({id:Date.now(),fieldName:fn.trim()||'Unknown Field',diseaseName:lastDiseaseResult.title,treatment:lastDiseaseResult.treatment,addedAt:new Date(),followupAt:new Date(Date.now()+3*24*60*60*1000),resolved:false});
   document.getElementById('add-alert-btn').classList.remove('show');
+  saveSession(); // 💾 persist new disease alert
   renderDiseaseAlerts(); refreshSettingsDisplay();
-  showToast('Alert added - we will check back in 3 days');
+  showToast('🚨 Alert added - we will check back in 3 days');
   document.querySelectorAll('.nav-item')[0].click();
 }
 
@@ -979,30 +1099,114 @@ function checkFollowups() {
 
 function resolveAlert(id, resolved) {
   var a=diseaseAlerts.find(function(x){return x.id===id;}); if (!a) return;
-  if (resolved) { a.resolved=true; showToast('Alert removed for '+a.fieldName); }
-  else { a.followupAt=new Date(Date.now()+3*24*60*60*1000); showToast('Will remind again in 3 days'); }
+  if (resolved) { a.resolved=true; showToast('✅ Alert removed for '+a.fieldName); }
+  else { a.followupAt=new Date(Date.now()+3*24*60*60*1000); showToast('🔔 Will remind again in 3 days'); }
+  saveSession(); // 💾 persist alert change
   renderDiseaseAlerts(); checkFollowups(); refreshSettingsDisplay();
 }
 
 function clearAllAlerts() {
   if (!diseaseAlerts.length) { showToast('No alerts to clear'); return; }
   if (!confirm('Clear all disease alerts?')) return;
-  diseaseAlerts=[]; renderDiseaseAlerts(); checkFollowups(); refreshSettingsDisplay(); showToast('All alerts cleared');
+  diseaseAlerts=[]; saveSession(); // 💾 persist cleared alerts
+  renderDiseaseAlerts(); checkFollowups(); refreshSettingsDisplay(); showToast('✅ All alerts cleared');
 }
 
+// Replaced broken keys with native Gemini integrations provided by the environment
 function runCropAdvisor() {
-  var btn=document.getElementById('crop-btn'); btn.textContent='Checking...'; btn.disabled=true;
-  fetch(API+'/api/crops/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({soil:document.getElementById('c-soil').value,season:document.getElementById('c-season').value,water:document.getElementById('c-water').value,farmer:farmerData})})
-  .then(function(r){return r.json();}).then(function(data){showCropResults(data.crops||[]);})
-  .catch(function(){document.getElementById('crop-results').innerHTML='<div class="card-title">Suggested Crops</div><div class="no-data-msg">Backend not connected.</div>';document.getElementById('crop-results').style.display='block';})
-  ['finally'](function(){btn.textContent='Get Crop Suggestions';btn.disabled=false;});
+  var btn = document.getElementById('crop-btn');
+  var soil   = document.getElementById('c-soil').value.trim();
+  var season = document.getElementById('c-season').value.trim();
+  var water  = document.getElementById('c-water').value.trim();
+
+  if (!soil || !season) { showToast('Please enter soil type and season'); return; }
+
+  btn.textContent = '⏳ Analysing...'; btn.disabled = true;
+  document.getElementById('crop-results').style.display = 'none';
+
+  // Step 1: fetch live weather (OWM original logic preserved)
+  var CROP_API_KEY = '4547ca5a3b066ec1425e46f56f24302b';
+  var weatherPromise;
+  if (farmerLat !== null && farmerLon !== null) {
+    weatherPromise = fetch(
+      'https://api.openweathermap.org/data/2.5/weather?lat=' + farmerLat +
+      '&lon=' + farmerLon + '&appid=' + CROP_API_KEY + '&units=metric'
+    ).then(function(r){ return r.json(); }).then(function(d){
+      return 'Current weather at farm: ' + Math.round(d.main.temp) + '°C, humidity ' +
+             d.main.humidity + '%, ' + d.weather[0].description + ', wind ' +
+             Math.round(d.wind.speed) + ' km/h.';
+    }).catch(function(){ return ''; });
+  } else {
+    weatherPromise = Promise.resolve('');
+  }
+
+  weatherPromise.then(function(weatherCtx) {
+    // Step 2: Swap to native Gemini API to ensure no bugs/broken keys
+    var prompt = 'Farmer details:' +
+      '\n- Name: ' + (farmerData.name || 'Unknown') +
+      '\n- Location: ' + (farmerData.village || 'India') +
+      '\n- Land: ' + (farmerData.acres || 'unknown') + ' acres' +
+      '\n- Water source: ' + (water || farmerData.water || 'unknown') +
+      '\n- Existing crops: ' + (farmerData.crops || 'unknown') +
+      '\n\nField conditions:' +
+      '\n- Soil type: ' + soil +
+      '\n- Season: ' + season +
+      '\n- Water availability: ' + (water || 'unknown') +
+      (weatherCtx ? '\n\n' + weatherCtx : '') +
+      '\n\nRecommend the TOP 6 best crops for this farmer.';
+
+    const apiKey = "";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        systemInstruction: { parts: [{ text: "You are an expert Indian agricultural advisor. Respond ONLY with a valid JSON array. Format: [{\"name\":\"Crop Name\",\"emoji\":\"🌾\",\"why\":\"One short reason why it suits this farmer\"}]" }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "ARRAY",
+            items: {
+              type: "OBJECT",
+              properties: { name: { type: "STRING" }, emoji: { type: "STRING" }, why: { type: "STRING" } }
+            }
+          }
+        }
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+      var crops;
+      try { crops = JSON.parse(raw); } catch(e) { crops = []; }
+      showCropResults(crops);
+    })
+    .catch(function(){
+      showToast('❌ Could not get crop suggestions. Check internet connection.');
+      document.getElementById('crop-results').style.display = 'none';
+    })
+    ['finally'](function(){ btn.textContent = '🔍 Get Crop Suggestions'; btn.disabled = false; });
+  });
 }
 
 function showCropResults(crops) {
-  if (!crops.length) { document.getElementById('crop-results').innerHTML='<div class="card-title">Suggested Crops</div><div class="no-data-msg">No crops returned.</div>'; document.getElementById('crop-results').style.display='block'; return; }
-  document.getElementById('crop-grid').innerHTML=crops.map(function(c){return '<div class="crop-card"><div class="crop-emoji">'+(c.emoji||'')+'</div><div class="crop-name">'+c.name+'</div><div class="crop-why">'+(c.why||'')+'</div></div>';}).join('');
-  document.getElementById('crop-results').style.display='block';
-  showToast('Crop suggestions ready!');
+  var resultsEl = document.getElementById('crop-results');
+  if (!crops || !crops.length) {
+    resultsEl.innerHTML = '<div class="card-title">✅ Best Crops for Your Field</div><div class="no-data-msg">No suggestions returned. Please try again.</div>';
+    resultsEl.style.display = 'block';
+    return;
+  }
+  document.getElementById('crop-grid').innerHTML = crops.map(function(c) {
+    return '<div class="crop-card">' +
+      '<div class="crop-emoji">' + (c.emoji || '🌱') + '</div>' +
+      '<div class="crop-name">' + (c.name || '') + '</div>' +
+      '<div class="crop-why">'  + (c.why  || '') + '</div>' +
+      '</div>';
+  }).join('');
+  resultsEl.style.display = 'block';
+  showToast('✅ Crop suggestions ready!');
 }
 
 var FIELD_LABELS={name:'Your Name',village:'Village / Town',water:'Water Source',numfields:'Number of Fields',fieldnames:'Field Names',crops:'Crops Grown',acres:'Total Land (Acres)',notes:'Farm Notes'};
@@ -1038,7 +1242,8 @@ function saveModalField() {
   if (['name','village','numfields','fieldnames','crops'].includes(currentEditField)&&!nv){showToast('This field cannot be empty');return;}
   farmerData[currentEditField]=nv;
   if (currentEditField==='numfields') farmerData.numfields=parseInt(nv)||farmerData.numfields;
-  refreshSettingsDisplay(); closeModal(); showToast('Updated!');
+  saveSession(); // 💾 persist settings change
+  refreshSettingsDisplay(); closeModal(); showToast('✅ Updated!');
 }
 
 function closeModal() { document.getElementById('edit-modal').classList.remove('show'); }
@@ -1246,105 +1451,57 @@ function fmtReply(text) {
     .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
 }
 
+// Swapped to native Gemini integration for better stability and free API access!
 function sendChatMessage() {
   if (chatTyping) return;
-  var input = document.getElementById('chat-input');
-  var text  = input.value.trim();
-  if (!text) return;
+  var input=document.getElementById('chat-input');
+  var text=input.value.trim(); if (!text) return;
+  input.value=''; input.style.height='auto';
+  document.getElementById('chat-send').disabled=true;
+  document.getElementById('chat-chips').style.display='none';
+  
+  appendBubble('user',escHtml(text));
+  chatHistory.push({role:'user',content:text});
+  chatTyping=true; showTyping();
+  document.getElementById('chat-status-line').textContent='Thinking...';
 
-  input.value = ''; input.style.height = 'auto';
-  document.getElementById('chat-send').disabled = true;
-  document.getElementById('chat-chips').style.display = 'none';
-  appendBubble('user', escHtml(text));
-  chatHistory.push({ role: 'user', content: text });
-  chatTyping = true; showTyping();
-  document.getElementById('chat-status-line').textContent = 'Thinking...';
+  var sys='You are Kisan AI, a friendly farming assistant for Indian farmers. Help with crops, soil, irrigation, pests, diseases, fertilizers, weather, market tips. Use simple language. Keep answers practical and concise. Use bullet points for lists. Add relevant emojis.\n\nFarmer context - Name: '+farmerData.name+', Village: '+farmerData.village+', Crops: '+farmerData.crops+', Fields: '+farmerData.fieldnames+', Water: '+(farmerData.water||'unknown')+', Land: '+(farmerData.acres||'unknown')+' acres.';
 
-  /* ════════════════════════════════════════════════════════════════════
-     CHAT API — TWO MODES, PICK ONE:
+  const apiKey = ""; // Environment securely provisions this natively
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-     MODE A (current — direct Anthropic, works without a backend):
-       Calls api.anthropic.com directly from the browser.
-       Requires ANTHROPIC_KEY to be filled in above.
-       ⚠️  Works only if anthropic-dangerous-direct-browser-access is allowed.
+  // format history for gemini
+  const geminiHistory = chatHistory.map(function(m) {
+    return {
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    };
+  });
 
-     MODE B (production — route through your Flask backend):
-       Comment out MODE A block below and uncomment MODE B block.
-       Your Flask app.py needs:
-         @app.route('/api/chat/message', methods=['POST'])
-         def chat():
-             data = request.get_json()
-             # call Anthropic here with your key stored as env variable
-             # return jsonify({'reply': reply_text})
-       Backend receives: { message, history, farmer }
-       Backend returns:  { reply }
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── MODE A: Direct Anthropic call (no backend needed) ── */
-  var sys = 'You are Kisan AI, a friendly farming assistant for Indian farmers. '
-    + 'Help with crops, soil, irrigation, pests, diseases, fertilizers, weather, market tips. '
-    + 'Use simple language. Keep answers practical and concise. Use bullet points for lists. Add relevant emojis.\n\n'
-    + 'Farmer context - Name: ' + farmerData.name
-    + ', Village: ' + farmerData.village
-    + ', Crops: ' + farmerData.crops
-    + ', Fields: ' + farmerData.fieldnames
-    + ', Water: ' + (farmerData.water || 'unknown')
-    + ', Land: ' + (farmerData.acres || 'unknown') + ' acres.';
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: sys,
-      messages: chatHistory
+  fetch(url,{
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body:JSON.stringify({
+      contents: geminiHistory,
+      systemInstruction: { parts: [{ text: sys }] }
     })
   })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
+  .then(function(r){return r.json();})
+  .then(function(data){
     hideTyping();
-    var reply = (data.content && data.content[0] && data.content[0].text)
-      ? data.content[0].text
-      : 'Sorry, could not get a response. Please try again.';
-    chatHistory.push({ role: 'assistant', content: reply });
-    appendBubble('ai', fmtReply(reply));
-    document.getElementById('chat-status-line').textContent = 'Ask me anything about farming';
+    var reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, could not get a response. Please try again.';
+    chatHistory.push({role:'assistant',content:reply});
+    appendBubble('ai',fmtReply(reply));
+    document.getElementById('chat-status-line').textContent='Ask me anything about farming';
   })
-  .catch(function() {
+  .catch(function(){
     hideTyping();
-    appendBubble('ai', 'Could not connect. Please check your internet and try again.');
-    document.getElementById('chat-status-line').textContent = 'Connection error';
+    appendBubble('ai','Could not connect. Please check your internet and try again.');
+    document.getElementById('chat-status-line').textContent='Connection error';
   })
-  ['finally'](function() { chatTyping = false; document.getElementById('chat-send').disabled = false; });
-
-  /* ── MODE B: Route through Flask backend (uncomment when backend is ready) ──
-  fetch(API + '/api/chat/message', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: text, history: chatHistory, farmer: farmerData })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    hideTyping();
-    var reply = data.reply || 'No response received.';
-    chatHistory.push({ role: 'assistant', content: reply });
-    appendBubble('ai', fmtReply(reply));
-    document.getElementById('chat-status-line').textContent = 'Ask me anything about farming';
-  })
-  .catch(function() {
-    hideTyping();
-    appendBubble('ai', 'Backend not connected. Check server is running.');
-    document.getElementById('chat-status-line').textContent = 'Connection error';
-  })
-  ['finally'](function() { chatTyping = false; document.getElementById('chat-send').disabled = false; });
-  ── end MODE B ── */
+  ['finally'](function(){chatTyping=false;document.getElementById('chat-send').disabled=false;});
 }
+
 </script>
 </body>
 </html>
